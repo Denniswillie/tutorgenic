@@ -1,11 +1,2 @@
-# mern-stack-template
-
-1. `git clone https://github.com/Denniswillie/mern-stack-template.git <directory>`
-2. `cd <directory>`
-3. `npm i`
-4. `cd client`
-5. `npm i`
-6. `cd ..`
-7. `git remote remove origin`
-
-This repo is configured to be deployed to heroku.
+# Tutorgenic
+Tutorgenic is a platform that connects tutors with students by providing an all-in-one tutoring environment that supports fully online learning experience.
