@@ -50,6 +50,8 @@ app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.set('db', db);
+
 app.use('/auth', require('./routes/auth'));
 
 const server = app.listen(port);
