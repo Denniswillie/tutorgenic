@@ -4,11 +4,7 @@ import axios from 'axios';
 export default function Auth() {
     useEffect(() => {
         const ac = new AbortController();
-        axios({
-            method: 'get',
-            url: '/auth/isLoggedIn',
-            headers: {'Content-Type': 'multipart/form-data'}
-        })
+        axios.get('/auth/isLoggedIn')
             .then(res => res.data)
             .catch(err => console.log(err))
             .then(res => {
@@ -117,7 +113,10 @@ export default function Auth() {
             {displayLogin && <div className="social-icons">
                 <img 
                     src={process.env.PUBLIC_URL + '/images/google.png'} 
-                    alt="google login"/>
+                    alt="google login"
+                    onClick={() => {
+                        window.location.href = "/auth/google";
+                    }}/>
             </div>}
             <form id="login" ref={loginFormRef} className="input-group">
                 <input name="username" value={username} onChange={handleChangeUsername} type="text" className="input-field" placeholder="Enter your username"/>

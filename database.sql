@@ -13,7 +13,9 @@ create table Users (
 	experiences json,
 	rating DECIMAL(3,1),
 	credits DECIMAL(10,2) DEFAULT 0.00,
-	isTutor BOOLEAN DEFAULT 'f'
+	isTutor BOOLEAN DEFAULT 'f',
+    googleId varchar(255),
+    email varchar(320)
 );
 
 create table Follows (
@@ -63,3 +65,21 @@ WITH (OIDS=FALSE);
 ALTER TABLE "session" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE;
 
 CREATE INDEX "IDX_session_expire" ON "session" ("expire");
+
+create or replace function findOrCreateGoogleUser(
+	created_username varchar(320),
+	created_fullname varchar(255),
+	created_googleid varchar(255)
+)
+returns table(found_id int, found_username varchar(320))
+language plpgsql
+as $$
+declare data record;
+begin
+	INSERT INTO users (username, fullname, googleid) SELECT created_username, created_fullname, created_googleid WHERE
+    NOT EXISTS (
+        SELECT googleid FROM users WHERE googleid = created_googleid
+    );
+	for data in (SELECT _id, username FROM users WHERE googleid = created_googleid)
+	loop found_id := data._id; found_username := data.username; return next; end loop;
+end; $$

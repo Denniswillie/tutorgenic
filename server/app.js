@@ -8,9 +8,11 @@ const multer = require('multer');
 const upload = multer();
 const passport = require('passport');
 const session = require('express-session');
-const bcrypt = require('bcrypt');
-const LocalStrategy = require('passport-local').Strategy;
-const db = require('./db');
+
+
+// passportSetup will use the pool first, and then will be handed to app.js.
+const db = require('./passportSetup');
+
 const passportSocketIo = require('passport.socketio');
 const cookieParser = require('cookie-parser');
 const pgSession = require('connect-pg-simple')(session);
@@ -48,46 +50,9 @@ app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.use(new LocalStrategy({
-    passReqToCallback: true
-}, async (req, username, password, done) => {
-    try {
-        const result = await db.query('SELECT _id, username, password FROM users WHERE username = $1', [username]);
-        if (result.rows[0]) {
-            const check = await bcrypt.compare(password, result.rows[0].password);
-            if (check) {
-                const data = result.rows[0];
-                return done(null, {
-                    username: data.username,
-                    _id: data._id
-                })
-            } else {
-                return done(null, false, {
-                    message: "incorrect password"
-                })
-            }
-        } else {
-            return done(null, false, {
-                message: "incorrect username"
-            })
-        }
-    } catch (err) {
-        console.log(err);
-        return done(null, false);
-    }
-}));
-
-passport.serializeUser((user, done) => {
-    done(null, user);
-})
-
-passport.deserializeUser((user, done) => {
-    done(null, user);
-})
+app.use('/auth', require('./routes/auth'));
 
 const server = app.listen(port);
-
-app.use('/auth', require('./routes/auth'));
 
 const io = socket(server, {
     cors: {
