@@ -4,6 +4,7 @@ drop table if exists Courses;
 drop table if exists Follows;
 drop table if exists Users;
 drop table if exists Session;
+drop function if exists findOrCreateGoogleUser;
 
 create table Users (
 	_id serial primary key,
@@ -15,8 +16,12 @@ create table Users (
 	credits DECIMAL(10,2) DEFAULT 0.00,
 	isTutor BOOLEAN DEFAULT 'f',
     googleId varchar(255),
-    email varchar(320)
+	isAdmin BOOLEAN DEFAULT 'f'
 );
+
+INSERT INTO users (username, password, fullName, isTutor, isAdmin) values('dennis', 'ngentat_ngentot_ngentat_ngentot6969', 'Dennis Willie', 't', 't');
+INSERT INTO users (username, password, fullName, isTutor, isAdmin) values('jeff', 'ngentat_ngentot_ngentat_ngentot6969', 'Mark Jefferson', 't', 't');
+INSERT INTO users (username, password, fullName, isTutor, isAdmin) values('felix', 'ngentat_ngentot_ngentat_ngentot6969', 'Felix Xavier', 't', 't');
 
 create table Follows (
 	followerId int NOT NULL,
