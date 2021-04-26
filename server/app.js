@@ -37,7 +37,7 @@ const sessionMiddleware = session({
     cookie: {
         httpOnly: false
     },
-    key: process.env.SESSION_KEY,
+    skey: process.env.SESSION_KEY,
     secret: process.env.SESSION_SECRET,
     resave: true,
     saveUninitialized: false,
@@ -52,7 +52,7 @@ passport.use(new LocalStrategy({
     passReqToCallback: true
 }, async (req, username, password, done) => {
     try {
-        const result = await db.query('SELECT _id, username, password FROM user WHERE username = $1', [username]);
+        const result = await db.query('SELECT _id, username, password FROM users WHERE username = $1', [username]);
         if (result.rows[0]) {
             const check = await bcrypt.compare(password, result.rows[0].password);
             if (check) {
@@ -72,6 +72,7 @@ passport.use(new LocalStrategy({
             })
         }
     } catch (err) {
+        console.log(err);
         return done(null, false);
     }
 }));
@@ -84,9 +85,9 @@ passport.deserializeUser((user, done) => {
     done(null, user);
 })
 
-app.use('/auth', require('./routes/auth'));
-
 const server = app.listen(port);
+
+app.use('/auth', require('./routes/auth'));
 
 const io = socket(server, {
     cors: {

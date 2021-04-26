@@ -17,11 +17,13 @@ router.get('/isLoggedIn', async (req, res) => {
 })
 
 router.post('/register', upload.none(), async (req, res, next) => {
+    console.log("fsdfs");
     const username = req.body.username;
     const password = req.body.password;
+    const fullName = req.body.fullName;
     try {
         var hashed = await bcrypt.hash(password, 5);
-        await db.query('INSERT INTO user(username, password) values($1, $2)', [username, hashed]);
+        await db.query('INSERT INTO users(username, password, fullname) values($1, $2, $3)', [username, hashed, fullName]);
         next();
     } catch (err) {
         console.log(err);

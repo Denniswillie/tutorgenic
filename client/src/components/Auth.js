@@ -4,7 +4,11 @@ import axios from 'axios';
 export default function Auth() {
     useEffect(() => {
         const ac = new AbortController();
-        axios.get('/auth/isLoggedIn')
+        axios({
+            method: 'get',
+            url: '/auth/isLoggedIn',
+            headers: {'Content-Type': 'multipart/form-data'}
+        })
             .then(res => res.data)
             .catch(err => console.log(err))
             .then(res => {
@@ -82,6 +86,7 @@ export default function Auth() {
 
     function handleRegister(event) {
         event.preventDefault();
+        console.log('register');
         const formData = new FormData(registerFormRef.current);
         axios({
             method: 'post',
