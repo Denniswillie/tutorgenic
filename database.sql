@@ -2,33 +2,36 @@ drop table if exists Reviews;
 drop table if exists CourseStudentRelationships;
 drop table if exists Courses;
 drop table if exists Follows;
+drop table if exists Posts;
 drop table if exists Users;
 drop table if exists Session;
 drop function if exists findOrCreateGoogleUser;
 
 create table Users (
 	_id serial primary key,
-	username varchar(255) NOT NULL,
-	password varchar(255) NOT NULL,
-	fullName varchar(255) NOT NULL,
+	firstName varchar(50),
+	lastName varchar(50),
+	email varchar(320),
+	password varchar(255),
 	experiences json,
+	educations json,
 	rating DECIMAL(3,1),
 	credits DECIMAL(10,2) DEFAULT 0.00,
+	savedTutorIds integer[],
 	isTutor BOOLEAN DEFAULT 'f',
     googleId varchar(255),
-	isAdmin BOOLEAN DEFAULT 'f'
+	isAdmin BOOLEAN DEFAULT 'f',
+	signUpDate DATE
 );
 
-INSERT INTO users (username, password, fullName, isTutor, isAdmin) values('dennis', 'ngentat_ngentot_ngentat_ngentot6969', 'Dennis Willie', 't', 't');
-INSERT INTO users (username, password, fullName, isTutor, isAdmin) values('jeff', 'ngentat_ngentot_ngentat_ngentot6969', 'Mark Jefferson', 't', 't');
-INSERT INTO users (username, password, fullName, isTutor, isAdmin) values('felix', 'ngentat_ngentot_ngentat_ngentot6969', 'Felix Xavier', 't', 't');
+INSERT INTO users (username, password, fullName, isTutor, isAdmin) values('dennis', 'password', 'Dennis Willie', 't', 't');
+INSERT INTO users (username, password, fullName, isTutor, isAdmin) values('jeff', 'password', 'Mark Jefferson', 't', 't');
+INSERT INTO users (username, password, fullName, isTutor, isAdmin) values('felix', 'password', 'Felix Xavier', 't', 't');
 
-create table Follows (
-	followerId int NOT NULL,
-	followedId int NOT NULL,
-	PRIMARY KEY(followerId, followedId),
-	FOREIGN KEY (followerId) REFERENCES Users(_id),
-	FOREIGN KEY (followedId) REFERENCES Users(_id)
+create table Posts (
+	_id serial PRIMARY KEY,
+	creatorId int NOT NULL,
+	text TEXT
 );
 
 create table Courses (
