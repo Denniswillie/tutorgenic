@@ -13,28 +13,37 @@ passport.use(new LocalStrategy({
     passReqToCallback: true
 }, async (req, username, password, done) => {
     try {
-        const result = await db.query('SELECT _id, username, password FROM users WHERE username = $1', [username]);
+        const result = await db.query('SELECT _id, firstName, lastName, password FROM users WHERE email = $1', [username]);
         if (result.rows[0]) {
-            const check = await bcrypt.compare(password, result.rows[0].password);
-            if (check) {
-                const data = result.rows[0];
-                return done(null, {
-                    username: data.username,
-                    _id: data._id
-                })
+            if (result.rows[0].password) {
+                const check = await bcrypt.compare(password, result.rows[0].password);
+                if (check) {
+                    const data = result.rows[0];
+                    return done(null, {
+                        firstName: data.firstname,
+                        lastName: data.lastname,
+                        _id: data._id
+                    })
+                } else {
+                    return done(null, false, {
+                        message: "incorrect password"
+                    })
+                }
             } else {
                 return done(null, false, {
-                    message: "incorrect password"
+                    message: "Login by using Google login."
                 })
             }
         } else {
             return done(null, false, {
-                message: "incorrect username"
+                message: "email does not exist"
             })
         }
     } catch (err) {
         console.log(err);
-        return done(null, false);
+        return done(null, false, {
+            message: err
+        });
     }
 }));
 
@@ -53,13 +62,38 @@ passport.use(new GoogleStrategy({
         userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
     },
     function (accessToken, refreshToken, profile, cb) {
+        // const googleId = profile.id;
         const email = profile.emails[0].value;
-        const googleId = profile.id;
-        const fullName = profile.displayName;
-        db.query('SELECT * FROM findOrCreateGoogleUser($1, $2, $3);', [email, fullName, googleId], (err, res) => {
+        const splitName = profile.displayName.split(" ");
+        const lastName = splitName.length > 1 ? splitName[splitName.length - 1] : "";
+        var firstName = "";
+        if (splitName.length > 1) {
+            for (var i = 0; i < splitName.length - 1; i++) {
+                if (i === 0) {
+                    firstName += splitName[i];
+                } else {
+                    firstName += (" " + splitName[i]);
+                }
+            }
+        } else {
+            firstName = splitName[0];
+        }
+
+        db.query('SELECT * FROM findOrCreateGoogleUser($1, $2, $3);', [email, firstName, lastName], (err, res) => {
+            if (err) {
+                if (err.message === process.env.LOGIN_ERROR) {
+                    return cb(undefined, false);
+                } else {
+                    return cb(err, false);
+                }
+            }
+            if (err) {
+                return cb(undefined, false);
+            }
             return cb(err, {
                 _id: res.rows[0].found_id,
-                username: res.rows[0].found_username
+                firstName: res.rows[0].found_firstname,
+                lastName: res.rows[0].found_lastname
             })
         });
     }

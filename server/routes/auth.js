@@ -17,12 +17,17 @@ router.get('/isLoggedIn', async (req, res) => {
 })
 
 router.post('/register', upload.none(), async (req, res, next) => {
-    const username = req.body.username;
+    const firstName = req.body.firstName;
+    const lastName = req.body.lastName;
+    const email = req.body.username;
     const password = req.body.password;
-    const fullName = req.body.fullName;
     try {
+        const existingData = await db.query('SELECT * FROM users WHERE email = $1', [email]);
+        if (existingData.rows.length > 0) {
+            throw new Error('Account already exists');
+        }
         var hashed = await bcrypt.hash(password, 5);
-        await db.query('INSERT INTO users(username, password, fullname) values($1, $2, $3)', [username, hashed, fullName]);
+        await db.query('INSERT INTO users(firstName, lastName, email, password) values($1, $2, $3, $4)', [firstName, lastName, email, hashed]);
         passport.authenticate('local', (err, user, info) => {
             if (err) {
                 return res.send({
@@ -55,8 +60,9 @@ router.post('/register', upload.none(), async (req, res, next) => {
 router.post('/login', upload.none(), (req, res, next) => {
     passport.authenticate('local', (err, user, info) => {
         if (err) {
+            console.log(err);
             return res.send({
-                isLoggedIn: false
+                isLoggedIn: false,
             })
         }
         if (user) {
@@ -89,7 +95,7 @@ router.get("/google",
 
 router.get("/google/tutorgenic",
     passport.authenticate('google', {
-        failureRedirect: process.env.CLIENT_URL,
+        failureRedirect: process.env.CLIENT_URL + '/googlefailure',
         successRedirect: process.env.CLIENT_URL
     })
 );

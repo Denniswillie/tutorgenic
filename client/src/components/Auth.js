@@ -1,7 +1,7 @@
 import {useState, useEffect, useRef} from 'react';
 import axios from 'axios';
 
-export default function Auth() {
+export default function Auth(props) {
     useEffect(() => {
         const ac = new AbortController();
         axios.get('/auth/isLoggedIn')
@@ -10,6 +10,8 @@ export default function Auth() {
             .then(res => {
                 if (res.isLoggedIn) {
                     window.open('/home', '_self');
+                } else if (props.error) {
+                    alert(props.error);
                 }
             })
             .catch(err => console.log(err));
@@ -20,14 +22,16 @@ export default function Auth() {
     const loginFormRef = useRef();
     const registerFormRef = useRef();
     const [displayLogin, setDisplayLogin] = useState(true);
-    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
     const [password, setPassword] = useState("");
-    const [fullName, setFullName] = useState("");
     function displayLoginForm() {
         if (!displayLogin) {
-            setUsername("");
+            setEmail("");
+            setFirstName("");
+            setLastName("");
             setPassword("");
-            setFullName("");
         }
         setDisplayLogin(true);
         document.getElementById("login").style.left = "50px";
@@ -37,9 +41,10 @@ export default function Auth() {
 
     function displayRegisterForm() {
         if (displayLogin) {
-            setUsername("");
+            setEmail("");
+            setFirstName("");
+            setLastName("");
             setPassword("");
-            setFullName("");
         }
         setDisplayLogin(false);
         document.getElementById("login").style.left = "-400px";
@@ -47,16 +52,20 @@ export default function Auth() {
         document.getElementById("btn").style.left = "110px";
     }
 
-    function handleChangeUsername(event) {
-        setUsername(event.target.value);
+    function handleChangeEmail(event) {
+        setEmail(event.target.value);
+    }
+
+    function handleChangeFirstName(event) {
+        setFirstName(event.target.value);
+    }
+
+    function handleChangeLastName(event) {
+        setLastName(event.target.value);
     }
 
     function handleChangePassword(event) {
         setPassword(event.target.value);
-    }
-
-    function handleChangeFullName(event) {
-        setFullName(event.target.value);
     }
 
     function handleLogin(event) {
@@ -119,13 +128,14 @@ export default function Auth() {
                     }}/>
             </div>}
             <form id="login" ref={loginFormRef} className="input-group">
-                <input name="username" value={username} onChange={handleChangeUsername} type="text" className="input-field" placeholder="Enter your username"/>
+                <input name="username" value={email} onChange={handleChangeEmail} type="text" className="input-field" placeholder="Enter your email"/>
                 <input name="password" value={password} onChange={handleChangePassword} type="password" className="input-field" placeholder="Enter your password"/>
                 <button type="submit" className="submit-btn" onClick={handleLogin}>Login</button>
             </form>
             <form id="register" ref={registerFormRef} className="input-group">
-                <input name="fullName" value={fullName} onChange={handleChangeFullName} type="text" className="input-field" placeholder="Enter your full name"/>
-                <input name="username" value={username} onChange={handleChangeUsername} type="text" className="input-field" placeholder="Create a username"/>
+                <input name="firstName" value={firstName} onChange={handleChangeFirstName} type="text" className="input-field" placeholder="Enter your first name"/>
+                <input name="lastName" value={lastName} onChange={handleChangeLastName} type="text" className="input-field" placeholder="Enter your last name"/>
+                <input name="username" value={email} onChange={handleChangeEmail} type="text" className="input-field" placeholder="Enter your email"/>
                 <input name="password" value={password} onChange={handleChangePassword} type="password" className="input-field" placeholder="Create a password"/>
                 <button type="submit" className="submit-btn" onClick={handleRegister}>Register</button>
             </form>

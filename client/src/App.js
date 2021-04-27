@@ -10,7 +10,10 @@ export default function App(props) {
   return (
     <main>
       <Switch>
-        <Route path="/" exact component={Auth}/>
+        <Route path="/" exact component={Auth} />
+        <Route path="/googlefailure" exact render={(props) => {
+          return <Auth error={"It seems that you have signed up with a password. Please login using your email and password."}/>
+        }}/>
         <Route path="/home" component={Home} />
         <Route path="/admin" component={AdminDashboard} />
         <Route path="/apply" component={ApplyTutor} />

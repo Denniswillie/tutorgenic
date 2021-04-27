@@ -1,11 +1,12 @@
 drop table if exists Reviews;
 drop table if exists CourseStudentRelationships;
 drop table if exists Courses;
-drop table if exists Follows;
 drop table if exists Posts;
+drop table if exists TutorApplications;
 drop table if exists Users;
 drop table if exists Session;
 drop function if exists findOrCreateGoogleUser;
+drop index if exists IDX_session_expire;
 
 create table Users (
 	_id serial primary key,
@@ -21,16 +22,24 @@ create table Users (
 	isTutor BOOLEAN DEFAULT 'f',
     googleId varchar(255),
 	isAdmin BOOLEAN DEFAULT 'f',
-	signUpDate DATE
+	signUpDate DATE,
+	isVerified BOOLEAN DEFAULT 'f'
 );
 
-INSERT INTO users (username, password, fullName, isTutor, isAdmin) values('dennis', 'password', 'Dennis Willie', 't', 't');
-INSERT INTO users (username, password, fullName, isTutor, isAdmin) values('jeff', 'password', 'Mark Jefferson', 't', 't');
-INSERT INTO users (username, password, fullName, isTutor, isAdmin) values('felix', 'password', 'Felix Xavier', 't', 't');
+INSERT INTO users (firstname, lastname, email, password, isTutor, isAdmin, isVerified) values('Dennis', 'Willie', 'denniswillie2000@gmail.com', '$2b$05$GyEudUu/3wNxtq9vX6yUD.mQybpclvST2Bqe5GsYGF22TGdMBqv/6', 't', 't', 't');
+INSERT INTO users (firstname, lastname, email, password, isTutor, isAdmin, isVerified) values('Mark', 'Jefferson', 'jeffersonhandojo@gmail.com', '$2b$05$GyEudUu/3wNxtq9vX6yUD.mQybpclvST2Bqe5GsYGF22TGdMBqv/6', 't', 't', 't');
+INSERT INTO users (firstname, lastname, email, password, isTutor, isAdmin, isVerified) values('Felix', 'Xavier', 'xavier.felix222@gmail.com', '$2b$05$GyEudUu/3wNxtq9vX6yUD.mQybpclvST2Bqe5GsYGF22TGdMBqv/6', 't', 't', 't');
+
+create table TutorApplications (
+	userId int NOT NULL PRIMARY KEY,
+	timeOfCreation TIME,
+	subjects varchar(20)[],
+	FOREIGN KEY(userId) REFERENCES Users(_id)
+);
 
 create table Posts (
 	_id serial PRIMARY KEY,
-	timeOfCreation DATETIME NOT NULL,
+	timeOfCreation TIME NOT NULL,
 	creatorId int NOT NULL,
 	text TEXT NOT NULL
 );
@@ -76,19 +85,23 @@ ALTER TABLE "session" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFE
 CREATE INDEX "IDX_session_expire" ON "session" ("expire");
 
 create or replace function findOrCreateGoogleUser(
-	created_username varchar(320),
-	created_fullname varchar(255),
-	created_googleid varchar(255)
+	created_email varchar(320),
+	created_firstname varchar(50),
+	created_lastname varchar(50)
 )
-returns table(found_id int, found_username varchar(320))
+returns table(found_id int, found_firstname varchar(50), found_lastname varchar(50))
 language plpgsql
 as $$
-declare data record;
+declare 
+	data record; 
+	curr_password varchar(255);
 begin
-	INSERT INTO users (username, fullname, googleid) SELECT created_username, created_fullname, created_googleid WHERE
-    NOT EXISTS (
-        SELECT googleid FROM users WHERE googleid = created_googleid
-    );
-	for data in (SELECT _id, username FROM users WHERE googleid = created_googleid)
-	loop found_id := data._id; found_username := data.username; return next; end loop;
+	SELECT users.password into curr_password FROM users WHERE email = created_email LIMIT 1;
+	if not found then
+		INSERT INTO users (email, firstname, lastname, isverified) SELECT created_email, created_firstname, created_lastname, 't';
+	elsif curr_password IS NOT NULL then
+  		raise exception 'Must login with password';
+	end if;
+	for data in (SELECT _id, firstname, lastname FROM users WHERE email = created_email LIMIT 1)
+	loop found_id := data._id; found_firstname := data.firstname; found_lastname := data.lastname; return next; end loop;
 end; $$
