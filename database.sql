@@ -30,8 +30,9 @@ INSERT INTO users (username, password, fullName, isTutor, isAdmin) values('felix
 
 create table Posts (
 	_id serial PRIMARY KEY,
+	timeOfCreation DATETIME NOT NULL,
 	creatorId int NOT NULL,
-	text TEXT
+	text TEXT NOT NULL
 );
 
 create table Courses (
