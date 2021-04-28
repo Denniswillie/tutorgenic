@@ -2,6 +2,7 @@ import {useState, useEffect, useRef} from 'react';
 import axios from 'axios';
 
 export default function Auth(props) {
+    props.setDisplayNavbar(false);
     useEffect(() => {
         const ac = new AbortController();
         axios.get('/auth/isLoggedIn')
@@ -18,13 +19,13 @@ export default function Auth(props) {
         return () => {
             ac.abort();
         }
-    }, []);
+    }, [props.error]);
     const loginFormRef = useRef();
     const registerFormRef = useRef();
     const [displayLogin, setDisplayLogin] = useState(true);
     const [email, setEmail] = useState("");
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
+    const [first_name, setFirstName] = useState("");
+    const [last_name, setLastName] = useState("");
     const [password, setPassword] = useState("");
     function displayLoginForm() {
         if (!displayLogin) {
@@ -133,8 +134,8 @@ export default function Auth(props) {
                 <button type="submit" className="submit-btn" onClick={handleLogin}>Login</button>
             </form>
             <form id="register" ref={registerFormRef} className="input-group">
-                <input name="firstName" value={firstName} onChange={handleChangeFirstName} type="text" className="input-field" placeholder="Enter your first name"/>
-                <input name="lastName" value={lastName} onChange={handleChangeLastName} type="text" className="input-field" placeholder="Enter your last name"/>
+                <input name="first_name" value={first_name} onChange={handleChangeFirstName} type="text" className="input-field" placeholder="Enter your first name"/>
+                <input name="last_name" value={last_name} onChange={handleChangeLastName} type="text" className="input-field" placeholder="Enter your last name"/>
                 <input name="username" value={email} onChange={handleChangeEmail} type="text" className="input-field" placeholder="Enter your email"/>
                 <input name="password" value={password} onChange={handleChangePassword} type="password" className="input-field" placeholder="Create a password"/>
                 <button type="submit" className="submit-btn" onClick={handleRegister}>Register</button>

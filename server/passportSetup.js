@@ -13,15 +13,18 @@ passport.use(new LocalStrategy({
     passReqToCallback: true
 }, async (req, username, password, done) => {
     try {
-        const result = await db.query('SELECT _id, firstName, lastName, password FROM users WHERE email = $1', [username]);
+        const result = await db.query('SELECT _id, first_name, last_name, is_admin, is_verified, is_tutor, password FROM users WHERE email = $1', [username]);
         if (result.rows[0]) {
             if (result.rows[0].password) {
                 const check = await bcrypt.compare(password, result.rows[0].password);
                 if (check) {
                     const data = result.rows[0];
                     return done(null, {
-                        firstName: data.firstname,
-                        lastName: data.lastname,
+                        first_name: data.first_name,
+                        last_name: data.last_name,
+                        is_verified: data.is_verified,
+                        is_admin: data.is_admin,
+                        is_tutor: data.is_tutor,
                         _id: data._id
                     })
                 } else {
@@ -65,21 +68,21 @@ passport.use(new GoogleStrategy({
         // const googleId = profile.id;
         const email = profile.emails[0].value;
         const splitName = profile.displayName.split(" ");
-        const lastName = splitName.length > 1 ? splitName[splitName.length - 1] : "";
-        var firstName = "";
+        const last_name = splitName.length > 1 ? splitName[splitName.length - 1] : "";
+        var first_name = "";
         if (splitName.length > 1) {
             for (var i = 0; i < splitName.length - 1; i++) {
                 if (i === 0) {
-                    firstName += splitName[i];
+                    first_name += splitName[i];
                 } else {
-                    firstName += (" " + splitName[i]);
+                    first_name += (" " + splitName[i]);
                 }
             }
         } else {
-            firstName = splitName[0];
+            first_name = splitName[0];
         }
 
-        db.query('SELECT * FROM findOrCreateGoogleUser($1, $2, $3);', [email, firstName, lastName], (err, res) => {
+        db.query('SELECT * FROM findOrCreateGoogleUser($1, $2, $3);', [email, first_name, last_name], (err, res) => {
             if (err) {
                 if (err.message === process.env.LOGIN_ERROR) {
                     return cb(undefined, false);
@@ -90,10 +93,14 @@ passport.use(new GoogleStrategy({
             if (err) {
                 return cb(undefined, false);
             }
+            const data = res.rows[0];
             return cb(err, {
-                _id: res.rows[0].found_id,
-                firstName: res.rows[0].found_firstname,
-                lastName: res.rows[0].found_lastname
+                _id: data.found_id,
+                first_name: data.found_first_name,
+                last_name: data.found_last_name,
+                is_admin: data.found_is_admin,
+                is_tutor: data.found_is_tutor,
+                is_verified: data.found_is_verified
             })
         });
     }

@@ -17,8 +17,8 @@ router.get('/isLoggedIn', async (req, res) => {
 })
 
 router.post('/register', upload.none(), async (req, res, next) => {
-    const firstName = req.body.firstName;
-    const lastName = req.body.lastName;
+    const first_name = req.body.first_name;
+    const last_name = req.body.last_name;
     const email = req.body.username;
     const password = req.body.password;
     try {
@@ -27,7 +27,7 @@ router.post('/register', upload.none(), async (req, res, next) => {
             throw new Error('Account already exists');
         }
         var hashed = await bcrypt.hash(password, 5);
-        await db.query('INSERT INTO users(firstName, lastName, email, password) values($1, $2, $3, $4)', [firstName, lastName, email, hashed]);
+        await db.query('INSERT INTO users(first_name, last_name, email, password) values($1, $2, $3, $4)', [first_name, last_name, email, hashed]);
         passport.authenticate('local', (err, user, info) => {
             if (err) {
                 return res.send({

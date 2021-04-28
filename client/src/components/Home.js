@@ -1,9 +1,9 @@
-import {useEffect, useState} from 'react';
+import {useEffect} from 'react';
 import axios from 'axios';
 
-export default function Home() {
-    const [isTutor, setIsTutor] = useState(false);
-    const [isAdmin, setIsAdmin] = useState(false);
+export default function Home(props) {
+    const {setDisplayNavbar, setUser} = props;
+    setDisplayNavbar(true);
     useEffect(() => {
         const ac = new AbortController();
 
@@ -12,8 +12,8 @@ export default function Home() {
             .catch(err => console.log(err))
             .then(res => {
                 if (res.isLoggedIn) {
-                    setIsTutor(res.isTutor);
-                    setIsAdmin(res.isAdmin);
+                    const user = res.user;
+                    setUser(user);
                 } else {
                     window.open('/', '_self');
                 }
@@ -22,19 +22,8 @@ export default function Home() {
         return () => {
             ac.abort();
         }
-    }, []);
+    }, [setUser]);
     return <div>
-        <h1>Welcome to home page</h1>
-        {isAdmin && <button onClick={() => {
-            window.open('/admin', '_self');
-        }}>go to admin dashboard</button>}
-        {isTutor ? <button onClick={() => {
-            window.open('/tutorDashboard', '_self');
-        }}>Go to tutor dashboard</button> : <button onClick={() => {
-            window.open('/applyTutor', '_self');
-        }}>Request to be a tutor</button>}
-        <button onClick={() => {
-            window.open('/auth/logout', '_self');
-        }}>logout</button>
+
     </div>
 }
