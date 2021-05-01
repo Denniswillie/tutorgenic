@@ -4,8 +4,7 @@ import Home from './components/Home';
 import AdminDashboard from './components/AdminDashboard';
 import ApplyTutor from './components/ApplyTutor';
 import TutorDashboard from './components/TutorDashboard';
-import SavedTutors from './components/SavedTutors';
-import Sessions from './components/Sessions';
+import Search from './components/Search';
 import Navbar from './components/Navbar';
 import './styles.css';
 import {useState} from 'react';
@@ -22,6 +21,14 @@ export default function App(props) {
                         setDisplayNavbar={setDisplayNavbar}
                     />
                 }}/>
+                <Route path="/search" exact render={(props) => {
+                    return <div className="body">
+                        <Search
+                            setDisplayNavbar={setDisplayNavbar}
+                            setUser={setUser}
+                        />
+                    </div>
+                }}/>
                 <Route path="/googlefailure" exact render={(props) => {
                     return <Auth 
                         error={"It seems that you have signed up with a password. Please login using your email and password."}
@@ -37,12 +44,10 @@ export default function App(props) {
                     </div>
                 }}/>
                 <Route path="/admin" exact render={(props) => {
-                    return <div className="body">
-                        <AdminDashboard 
-                            setDisplayNavbar={setDisplayNavbar}
-                            setUser={setUser}
-                        />
-                    </div>
+                    return <AdminDashboard 
+                        setDisplayNavbar={setDisplayNavbar}
+                        setUser={setUser}
+                    />
                 }}/>
                 <Route path="/apply" exact render={(props) => {
                     return <div className="body">
@@ -55,22 +60,6 @@ export default function App(props) {
                 <Route path="/tutorDashboard" exact render={(props) => {
                     return <div className="body">
                         <TutorDashboard 
-                            setDisplayNavbar={setDisplayNavbar}
-                            setUser={setUser}
-                        />
-                    </div>
-                }}/>
-                <Route path="/savedTutors" exact render={(props) => {
-                    return <div className="body">
-                        <SavedTutors
-                            setDisplayNavbar={setDisplayNavbar}
-                            setUser={setUser}
-                        />
-                    </div>
-                }}/>
-                <Route path="/sessions" exact render={(props) => {
-                    return <div className="body">
-                        <Sessions
                             setDisplayNavbar={setDisplayNavbar}
                             setUser={setUser}
                         />

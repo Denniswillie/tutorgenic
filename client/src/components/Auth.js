@@ -112,26 +112,31 @@ export default function Auth(props) {
         .catch(err => console.log(err));
     }
 
+    function handleSubmit(e) {
+        console.log('submitted');
+    }
+
     return <div className="hero">
         <div className="form-box">
-            <h2 style={{margin: "auto"}}>Tutorgenic</h2>
+            <h1 style={{margin: "auto"}}>Tutorgenic</h1>
             <div className="button-box">
                 <div id="btn"></div>
                 <button type="button" className="toggle-btn" onClick={displayLoginForm}>Log In</button>
                 <button type="button" className="toggle-btn" onClick={displayRegisterForm}>Register</button>
             </div>
-            {displayLogin && <div className="social-icons">
-                <img 
-                    src={process.env.PUBLIC_URL + '/images/google.png'} 
-                    alt="google login"
-                    onClick={() => {
-                        window.location.href = "/auth/google";
-                    }}/>
-            </div>}
-            <form id="login" ref={loginFormRef} className="input-group">
+            <form onSubmit={handleSubmit} id="login" ref={loginFormRef} className="input-group">
                 <input name="username" value={email} onChange={handleChangeEmail} type="text" className="input-field" placeholder="Enter your email"/>
                 <input name="password" value={password} onChange={handleChangePassword} type="password" className="input-field" placeholder="Enter your password"/>
                 <button type="submit" className="submit-btn" onClick={handleLogin}>Login</button>
+                {displayLogin && <button type="button" className="submit-btn" onClick={() => {
+                            window.location.href = "/auth/google";
+                        }} style={{marginTop: "0.6em"}}>
+                    <img 
+                        src={process.env.PUBLIC_URL + '/images/google.png'} 
+                        alt="google login"
+                    />
+                    <p style={{paddingTop:"6px"}}>Login with Google</p>
+                </button>}
             </form>
             <form id="register" ref={registerFormRef} className="input-group">
                 <input name="first_name" value={first_name} onChange={handleChangeFirstName} type="text" className="input-field" placeholder="Enter your first name"/>

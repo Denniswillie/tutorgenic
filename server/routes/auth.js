@@ -21,13 +21,14 @@ router.post('/register', upload.none(), async (req, res, next) => {
     const last_name = req.body.last_name;
     const email = req.body.username;
     const password = req.body.password;
+    const image_url = "https://www.pngitem.com/pimgs/m/150-1503945_transparent-user-png-default-user-image-png-png.png";
     try {
         const existingData = await db.query('SELECT * FROM users WHERE email = $1', [email]);
         if (existingData.rows.length > 0) {
             throw new Error('Account already exists');
         }
         var hashed = await bcrypt.hash(password, 5);
-        await db.query('INSERT INTO users(first_name, last_name, email, password) values($1, $2, $3, $4)', [first_name, last_name, email, hashed]);
+        await db.query('INSERT INTO users(first_name, last_name, email, password, image_url) values($1, $2, $3, $4, $5)', [first_name, last_name, email, hashed, image_url]);
         passport.authenticate('local', (err, user, info) => {
             if (err) {
                 return res.send({

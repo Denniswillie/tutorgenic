@@ -2,12 +2,12 @@ drop table if exists Reviews;
 drop table if exists CourseStudentRelationships;
 drop table if exists Courses;
 drop table if exists Posts;
-drop table if exists TutorSubjectRelationships;
+drop table if exists TutorsApplications;
 drop table if exists StudentSavesTutorRelationships;
-drop table if exists Users;
-drop table if exists Subjects;
-drop table if exists Session;
+drop procedure if exists approveTutorSubject;
 drop function if exists findOrCreateGoogleUser;
+drop table if exists Users;
+drop table if exists Session;
 drop index if exists IDX_session_expire;
 
 create table Users (
@@ -16,32 +16,35 @@ create table Users (
 	last_name varchar(50),
 	email varchar(320),
 	password varchar(255),
-	experiences json,
-	educations json,
+	experiences json[],
+	educations json[],
 	rating DECIMAL(3,1),
 	credits DECIMAL(10,2) DEFAULT 0.00,
 	is_tutor BOOLEAN DEFAULT 'f',
 	is_admin BOOLEAN DEFAULT 'f',
 	sign_up_date DATE,
-	is_verified BOOLEAN DEFAULT 'f'
+	is_verified BOOLEAN DEFAULT 'f',
+	tutoring_subjects varchar(50)[],
+	phone_number text,
+	headline text,
+	description text,
+	gender int,
+	country varchar(50),
+	street_address text,
+	languages varchar(50)[],
+	image_url text
 );
 
-INSERT INTO users (first_name, last_name, email, password, is_tutor, is_admin, is_verified) values('Dennis', 'Willie', 'denniswillie2000@gmail.com', '$2b$05$GyEudUu/3wNxtq9vX6yUD.mQybpclvST2Bqe5GsYGF22TGdMBqv/6', 't', 't', 't');
-INSERT INTO users (first_name, last_name, email, password, is_tutor, is_admin, is_verified) values('Mark', 'Jefferson', 'jeffersonhandojo@gmail.com', '$2b$05$GyEudUu/3wNxtq9vX6yUD.mQybpclvST2Bqe5GsYGF22TGdMBqv/6', 't', 't', 't');
-INSERT INTO users (first_name, last_name, email, password, is_tutor, is_admin, is_verified) values('Felix', 'Xavier', 'xavier.felix222@gmail.com', '$2b$05$GyEudUu/3wNxtq9vX6yUD.mQybpclvST2Bqe5GsYGF22TGdMBqv/6', 't', 't', 't');
+INSERT INTO users (first_name, last_name, email, password, is_tutor, is_admin, is_verified, image_url) values('Dennis', 'Willie', 'denniswillie2000@gmail.com', '$2b$05$GyEudUu/3wNxtq9vX6yUD.mQybpclvST2Bqe5GsYGF22TGdMBqv/6', 't', 't', 't', 'https://lh3.googleusercontent.com/proxy/7EUlYrg9AvdJxHv8KSYIzdU_CqxWUcCsGNQGtFMcBOQ6qyr4lNivh4EXKGEUgcLPw4DXsLk4LIx9QfPxFxcZFX8-ZhL6XTKMp4KVrim_4mO9g-OpqD8kEg');
+INSERT INTO users (first_name, last_name, email, password, is_tutor, is_admin, is_verified, image_url) values('Mark', 'Jefferson', 'jeffersonhandojo@gmail.com', '$2b$05$GyEudUu/3wNxtq9vX6yUD.mQybpclvST2Bqe5GsYGF22TGdMBqv/6', 't', 't', 't', 'https://lh3.googleusercontent.com/proxy/7EUlYrg9AvdJxHv8KSYIzdU_CqxWUcCsGNQGtFMcBOQ6qyr4lNivh4EXKGEUgcLPw4DXsLk4LIx9QfPxFxcZFX8-ZhL6XTKMp4KVrim_4mO9g-OpqD8kEg');
+INSERT INTO users (first_name, last_name, email, password, is_tutor, is_admin, is_verified, image_url) values('Felix', 'Xavier', 'xavier.felix222@gmail.com', '$2b$05$GyEudUu/3wNxtq9vX6yUD.mQybpclvST2Bqe5GsYGF22TGdMBqv/6', 't', 't', 't', 'https://lh3.googleusercontent.com/proxy/7EUlYrg9AvdJxHv8KSYIzdU_CqxWUcCsGNQGtFMcBOQ6qyr4lNivh4EXKGEUgcLPw4DXsLk4LIx9QfPxFxcZFX8-ZhL6XTKMp4KVrim_4mO9g-OpqD8kEg');
 
-create table Subjects (
-	_id serial primary key,
-	title varchar(100)
-);
-
-create table TutorSubjectRelationships (
-	tutor_id int NOT NULL,
-	subject_id int NOT NULL,
-	is_approved BOOLEAN DEFAULT 'f',
-	PRIMARY KEY(tutor_id, subject_id),
-	FOREIGN KEY(tutor_id) REFERENCES Users(_id),
-	FOREIGN KEY(subject_id) REFERENCES Subjects(_id)
+create table TutorsApplications (
+	applicant_id int NOT NULL,
+	subjects varchar(50)[],
+	time_of_creation TIMESTAMPTZ NOT NULL,
+	PRIMARY KEY(applicant_id),
+	FOREIGN KEY(applicant_id) REFERENCES Users(_id)
 );
 
 create table StudentSavesTutorRelationships (
@@ -86,7 +89,7 @@ create table Reviews (
 	student_id int NOT NULL,
 	rating DECIMAL(3, 1),
 	message TEXT
-);
+)
 
 CREATE TABLE session (
   "sid" varchar NOT NULL COLLATE "default",
@@ -102,7 +105,8 @@ CREATE INDEX "IDX_session_expire" ON "session" ("expire");
 create or replace function findOrCreateGoogleUser(
 	created_email varchar(320),
 	created_firstname varchar(50),
-	created_lastname varchar(50)
+	created_lastname varchar(50),
+	created_imageurl TEXT
 )
 returns table(
 	found_id int, 
@@ -110,7 +114,8 @@ returns table(
 	found_lastname varchar(50),
 	found_isadmin BOOLEAN,
 	found_istutor BOOLEAN,
-	found_isverified BOOLEAN
+	found_isverified BOOLEAN,
+	found_imageurl TEXT
 )
 language plpgsql
 as $$
@@ -120,11 +125,11 @@ declare
 begin
 	SELECT users.password into curr_password FROM users WHERE email = created_email LIMIT 1;
 	if not found then
-		INSERT INTO users (email, first_name, last_name, is_verified) SELECT created_email, created_firstname, created_lastname, 't';
+		INSERT INTO users (email, first_name, last_name, is_verified, image_url) SELECT created_email, created_firstname, created_lastname, 't', created_imageurl;
 	elsif curr_password IS NOT NULL then
   		raise exception 'Must login with password';
 	end if;
-	for data in (SELECT _id, first_name, last_name, is_admin, is_tutor, is_verified FROM users WHERE email = created_email LIMIT 1)
+	for data in (SELECT _id, first_name, last_name, is_admin, is_tutor, is_verified, image_url FROM users WHERE email = created_email LIMIT 1)
 		loop 
 			found_id := data._id; 
 			found_firstname := data.first_name; 
@@ -132,6 +137,7 @@ begin
 			found_isadmin := data.is_admin;
 			found_istutor := data.is_tutor;
 			found_isverified := data.is_verified;
+			found_imageurl := data.image_url;
 			return next; 
 		end loop;
 end; $$

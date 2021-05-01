@@ -53,6 +53,8 @@ app.use(passport.session());
 app.set('db', db);
 
 app.use('/auth', require('./routes/auth'));
+app.use('/admin', require('./routes/admin'));
+app.use('/tutor', require('./routes/tutor'));
 
 const server = app.listen(port);
 
