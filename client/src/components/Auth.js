@@ -1,7 +1,8 @@
 import {useState, useEffect, useRef} from 'react';
 import axios from 'axios';
 
-export default function Auth() {
+export default function Auth(props) {
+    props.setDisplayNavbar(false);
     useEffect(() => {
         const ac = new AbortController();
         axios.get('/auth/isLoggedIn')
@@ -10,24 +11,28 @@ export default function Auth() {
             .then(res => {
                 if (res.isLoggedIn) {
                     window.open('/home', '_self');
+                } else if (props.error) {
+                    alert(props.error);
                 }
             })
             .catch(err => console.log(err));
         return () => {
             ac.abort();
         }
-    }, []);
+    }, [props.error]);
     const loginFormRef = useRef();
     const registerFormRef = useRef();
     const [displayLogin, setDisplayLogin] = useState(true);
-    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
+    const [first_name, setFirstName] = useState("");
+    const [last_name, setLastName] = useState("");
     const [password, setPassword] = useState("");
-    const [fullName, setFullName] = useState("");
     function displayLoginForm() {
         if (!displayLogin) {
-            setUsername("");
+            setEmail("");
+            setFirstName("");
+            setLastName("");
             setPassword("");
-            setFullName("");
         }
         setDisplayLogin(true);
         document.getElementById("login").style.left = "50px";
@@ -37,9 +42,10 @@ export default function Auth() {
 
     function displayRegisterForm() {
         if (displayLogin) {
-            setUsername("");
+            setEmail("");
+            setFirstName("");
+            setLastName("");
             setPassword("");
-            setFullName("");
         }
         setDisplayLogin(false);
         document.getElementById("login").style.left = "-400px";
@@ -47,16 +53,20 @@ export default function Auth() {
         document.getElementById("btn").style.left = "110px";
     }
 
-    function handleChangeUsername(event) {
-        setUsername(event.target.value);
+    function handleChangeEmail(event) {
+        setEmail(event.target.value);
+    }
+
+    function handleChangeFirstName(event) {
+        setFirstName(event.target.value);
+    }
+
+    function handleChangeLastName(event) {
+        setLastName(event.target.value);
     }
 
     function handleChangePassword(event) {
         setPassword(event.target.value);
-    }
-
-    function handleChangeFullName(event) {
-        setFullName(event.target.value);
     }
 
     function handleLogin(event) {
@@ -102,30 +112,36 @@ export default function Auth() {
         .catch(err => console.log(err));
     }
 
+    function handleSubmit(e) {
+        console.log('submitted');
+    }
+
     return <div className="hero">
         <div className="form-box">
-            <h2 style={{margin: "auto"}}>Tutorgenic</h2>
+            <h1 style={{margin: "auto"}}>Tutorgenic</h1>
             <div className="button-box">
                 <div id="btn"></div>
                 <button type="button" className="toggle-btn" onClick={displayLoginForm}>Log In</button>
                 <button type="button" className="toggle-btn" onClick={displayRegisterForm}>Register</button>
             </div>
-            {displayLogin && <div className="social-icons">
-                <img 
-                    src={process.env.PUBLIC_URL + '/images/google.png'} 
-                    alt="google login"
-                    onClick={() => {
-                        window.location.href = "/auth/google";
-                    }}/>
-            </div>}
-            <form id="login" ref={loginFormRef} className="input-group">
-                <input name="username" value={username} onChange={handleChangeUsername} type="text" className="input-field" placeholder="Enter your username"/>
+            <form onSubmit={handleSubmit} id="login" ref={loginFormRef} className="input-group">
+                <input name="username" value={email} onChange={handleChangeEmail} type="text" className="input-field" placeholder="Enter your email"/>
                 <input name="password" value={password} onChange={handleChangePassword} type="password" className="input-field" placeholder="Enter your password"/>
                 <button type="submit" className="submit-btn" onClick={handleLogin}>Login</button>
+                {displayLogin && <button type="button" className="submit-btn" onClick={() => {
+                            window.location.href = "/auth/google";
+                        }} style={{marginTop: "0.6em"}}>
+                    <img 
+                        src={process.env.PUBLIC_URL + '/images/google.png'} 
+                        alt="google login"
+                    />
+                    <p style={{paddingTop:"6px"}}>Login with Google</p>
+                </button>}
             </form>
             <form id="register" ref={registerFormRef} className="input-group">
-                <input name="fullName" value={fullName} onChange={handleChangeFullName} type="text" className="input-field" placeholder="Enter your full name"/>
-                <input name="username" value={username} onChange={handleChangeUsername} type="text" className="input-field" placeholder="Create a username"/>
+                <input name="first_name" value={first_name} onChange={handleChangeFirstName} type="text" className="input-field" placeholder="Enter your first name"/>
+                <input name="last_name" value={last_name} onChange={handleChangeLastName} type="text" className="input-field" placeholder="Enter your last name"/>
+                <input name="username" value={email} onChange={handleChangeEmail} type="text" className="input-field" placeholder="Enter your email"/>
                 <input name="password" value={password} onChange={handleChangePassword} type="password" className="input-field" placeholder="Create a password"/>
                 <button type="submit" className="submit-btn" onClick={handleRegister}>Register</button>
             </form>

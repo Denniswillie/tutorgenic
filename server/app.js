@@ -9,7 +9,6 @@ const upload = multer();
 const passport = require('passport');
 const session = require('express-session');
 
-
 // passportSetup will use the pool first, and then will be handed to app.js.
 const db = require('./passportSetup');
 
@@ -50,7 +49,13 @@ app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.set('db', db);
+
 app.use('/auth', require('./routes/auth'));
+app.use('/admin', require('./routes/admin'));
+app.use('/tutor', require('./routes/tutor'));
+app.use('/course', require('./routes/course'));
+app.use('/room', require('./routes/room'));
 
 const server = app.listen(port);
 
@@ -82,5 +87,65 @@ io.use(passportSocketIo.authorize({
 }))
 
 io.on('connection', async (socket) => {
+    const user = socket.request.user;
+    socket.on('courseId', courseId => {
+        socket.join(courseId.toString());
+        const numOfClients = io.sockets.adapter.rooms.get(courseId.toString()).size;
+        if (numOfClients > 1) {
+            io.emit('newclient', user._id);
+        }
+    })
 
+    socket.on('callerPing', ping => {
+        io.emit('callerPing', ping);
+    })
+
+    socket.on('calleePing', ping => {
+        io.emit('calleePing', ping);
+    })
+
+    socket.on('offer', offer => {
+        io.emit('offer', offer);
+    })
+
+    socket.on('answer', answer => {
+        io.emit('answer', answer);
+    })
+
+    socket.on('callerCandidates', callerCandidates => {
+        io.emit('callerCandidates', callerCandidates);
+    })
+
+    socket.on('calleeCandidates', calleeCandidates => {
+        io.emit('calleeCandidates', calleeCandidates);
+    })
+
+    // format:
+    // offer = {
+    //     destination: userId,
+    //     from: userId,
+    //     content: content
+    // }
+    // answer = {
+    //     destination: userId,
+    //     from: userId,
+    //     content: content
+    // }
+    // icecandidate = {
+    //     destination: userId,
+    //     from: userId,
+    //     content: content
+    // }
+
+    socket.on('offer', offer => {
+        io.emit('offer', offer);
+    })
+
+    socket.on('answer', answer => {
+        io.emit('answer', answer);
+    })
+
+    socket.on('icecandidate', icecandidate => {
+        io.emit('icecandidate', icecandidate);
+    })
 })
