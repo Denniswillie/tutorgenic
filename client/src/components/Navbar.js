@@ -1,6 +1,7 @@
 import SearchIcon from '@material-ui/icons/Search';
 import { makeStyles } from '@material-ui/core/styles';
 import axios from 'axios';
+import {useState} from 'react';
 
 function iconStyles() {
     return {
@@ -13,6 +14,7 @@ function iconStyles() {
 export default function Navbar(props) {
     const {user} = props;
     const classes = makeStyles(iconStyles)();
+    const [searchVal, setSearchVal] = useState("");
 
     function goToHome() {
         window.open('/home', '_self');
@@ -30,12 +32,31 @@ export default function Navbar(props) {
         window.open('/admin', '_self');
     }
 
+    function handleSearchSubmit(event) {
+        event.preventDefault();
+        const temp = searchVal;
+        setSearchVal("");
+        window.open('/search/' + temp, '_self');
+    }
+
     return <div className="navbar">
         <div className="navbar_left">
             <h2 className="navbar_title">Tutorgenic</h2>
             <div className="navbar_input">
                 <SearchIcon className={classes.searchIconColor}/>
-                <input placeholder="Search subjects or tutors" autoComplete="off" type="text"/>
+                <form onSubmit={handleSearchSubmit}>
+                    <input 
+                        id="input"
+                        style={{outline: "none"}}
+                        placeholder="Search subjects or tutors" 
+                        autoComplete="off" 
+                        type="text" 
+                        value={searchVal}
+                        onChange={(e) => {
+                            setSearchVal(e.target.value);
+                        }}/>
+                    <input type="submit" style={{display: "none"}} />
+                </form>
             </div>
         </div>
         <div className="navbar_right">

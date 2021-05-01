@@ -25,6 +25,7 @@ export default function TutorDashboard(props) {
     const [schedules, setSchedules] = useState([]);
     const [daynumbers, setDaynumbers] = useState([]);
     const [dayMemo, setDayMemo] = useState(new Date());
+    const [sessions, setSessions] = useState([]);
 
     const monthNames = ["January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
@@ -78,6 +79,16 @@ export default function TutorDashboard(props) {
                             alert('Failed');
                         }
                     })
+                    axios.get('/course/getScheduledCourses')
+                        .then(res => res.data)
+                        .catch(err => console.log(err))
+                        .then(res => {
+                            if (res.success) {
+                                setSessions(res.result);
+                            } else {
+                                alert('Failed to get scheduled sessions');
+                            }
+                        })
                 } else {
                     window.open('/', '_self');
                 }
@@ -370,7 +381,19 @@ export default function TutorDashboard(props) {
                     <h2>Schedules details</h2>
                 </div>
                 <div className="box_bottom">
-                    
+                    {sessions.length === 0 && "Your scheduled sessions will appear here."}
+                    {sessions.map(session => {
+                        return <div className="box" style={{width: "40%"}}>
+                            <div className="box_top">
+                                <h2>{session.title}</h2>
+                            </div>
+                            <div className="box_bottom">
+                                <u style={{cursor: "pointer"}} onClick={() => {
+                                    window.open('/room/' + session._id, '_self');
+                                }}>Click this link to open the meeting</u>
+                            </div>
+                        </div>
+                    })}
                 </div>
             </div>
         </div>

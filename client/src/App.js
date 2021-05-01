@@ -5,6 +5,8 @@ import AdminDashboard from './components/AdminDashboard';
 import ApplyTutor from './components/ApplyTutor';
 import TutorDashboard from './components/TutorDashboard';
 import Search from './components/Search';
+import TutorPage from './components/TutorPage';
+import Room from './components/Room';
 import Navbar from './components/Navbar';
 import './styles.css';
 import {useState} from 'react';
@@ -21,9 +23,36 @@ export default function App(props) {
                         setDisplayNavbar={setDisplayNavbar}
                     />
                 }}/>
-                <Route path="/search" exact render={(props) => {
+                <Route path="/search/:searchValue" exact render={(props) => {
                     return <div className="body">
                         <Search
+                            setDisplayNavbar={setDisplayNavbar}
+                            setUser={setUser}
+                            searchValue={props.match.params.searchValue}
+                        />
+                    </div>
+                }}/>
+                <Route path="/tutor/:tutorId" exact render={(props) => {
+                    return <div className="body">
+                        <TutorPage
+                            setDisplayNavbar={setDisplayNavbar}
+                            setUser={setUser}
+                            tutorId={props.match.params.tutorId}
+                        />
+                    </div>
+                }}/>
+                <Route path="/room/:courseId" exact render={(props) => {
+                    return <div className="body">
+                        <Room
+                            setDisplayNavbar={setDisplayNavbar}
+                            setUser={setUser}
+                            courseId={props.match.params.courseId}
+                        />
+                    </div>
+                }}/>
+                <Route path="/room" exact render={(props) => {
+                    return <div className="body">
+                        <Home  
                             setDisplayNavbar={setDisplayNavbar}
                             setUser={setUser}
                         />

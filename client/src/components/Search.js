@@ -1,10 +1,12 @@
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import axios from 'axios';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 
 export default function Search(props) {
-    const {setDisplayNavbar, setUser} = props;
+    const {setDisplayNavbar, setUser, searchValue} = props;
+    const [searchVal, setSearchVal] = useState("");
+    const [results, setResults] = useState([]);
     setDisplayNavbar(true);
     useEffect(() => {
         const ac = new AbortController();
@@ -15,8 +17,27 @@ export default function Search(props) {
             .then(res => {
                 if (res.isLoggedIn) {
                     const user = res.user;
-                    console.log(user);
                     setUser(user);
+                    if (searchValue) {
+                        setSearchVal(searchValue);
+                        const formData = new FormData();
+                        formData.set('search_value', searchValue);
+                        axios({
+                            method: 'post',
+                            url: '/tutor/search',
+                            data: formData,
+                            headers: {'Content-Type': 'multipart/form-data'}
+                        })
+                        .then(res => res.data)
+                        .catch(err => console.log(err))
+                        .then(res => {
+                            if (res.success) {
+                                setResults(res.result);
+                            } else {
+                                alert('Failed to get result');
+                            }
+                        })
+                    }
                 } else {
                     window.open('/', '_self');
                 }
@@ -26,6 +47,27 @@ export default function Search(props) {
             ac.abort();
         }
     }, [setUser]);
+
+    function handleSearchSubmit() {
+        const formData = new FormData();
+        formData.set('search_value', searchVal);
+        axios({
+            method: 'post',
+            url: '/tutor/search',
+            data: formData,
+            headers: {'Content-Type': 'multipart/form-data'}
+        })
+        .then(res => res.data)
+        .catch(err => console.log(err))
+        .then(res => {
+            if (res.success) {
+                setResults(res.result);
+            } else {
+                alert('Failed to get result');
+            }
+        })
+    }
+
     return <div className="wrapper">
         <div className="content" style={{flex: "1"}}>
             <div className="box" style={{flex: "0.2"}}>
@@ -37,32 +79,50 @@ export default function Search(props) {
                         id="outlined-basic" 
                         label="Search subjects or tutors" 
                         style={{width: "50%", margin: "auto"}}
-                        variant="outlined"/>
+                        variant="outlined"
+                        value={searchVal}
+                        onChange={(event) => {
+                            setSearchVal(event.target.value);
+                        }}/>
+                    <Button style={{height: "56px", marginLeft: "1em"}} variant="outlined" color="secondary" onClick={() => {
+                        handleSearchSubmit();
+                    }}>
+                        Search
+                    </Button>
                 </div>
             </div>
             <div style={{flex: "0.75", width: '95%', overflow: "auto", paddingTop: "10px"}}>
-                <div className="box" style={{margin: "auto", width: "70%"}}>
-                    <div className="box_top">
-                        <h3>Dennis Willie</h3>
-                    </div>
-                    <div className="box_bottom" style={{display: 'flex'}}>
-                        <div style={{flex: '0.1'}}>
-                            <img
-                                style={{width: "90px", height: "90px", borderRadius: "50%"}} 
-                                src="https://www.pngitem.com/pimgs/m/150-1503945_transparent-user-png-default-user-image-png-png.png" 
-                            />
+                {results.map(result => {
+                    return <div className="box" style={{margin: "auto", width: "70%"}}>
+                        <div className="box_top">
+                            <h3>{result.first_name + " " + result.last_name.slice(0, 1) + "."}</h3>
                         </div>
-                        <div style={{flex: '0.9', paddingLeft: "1em"}}>
-                            Bachelor of Science, Computing, Dundalk Institute of Technology <br /><br />
-                            <b>This is the headline</b> <br />
-                            am a second year medical student with over 7 years of experience tutoring university courses and the MCAT. I scored in the 97th percentile for the Chem/Phys and 99th percentile for the Bio/Biochem sections of the MCAT (2017). I have als
-                            <br /><br />
-                            <Button variant="outlined" color="secondary">
-                                view
-                            </Button>
+                        <div className="box_bottom" style={{display: 'flex'}}>
+                            <div style={{flex: '0.1'}}>
+                                <img
+                                    style={{width: "90px", height: "90px", borderRadius: "50%"}} 
+                                    src={result.image_url}
+                                />
+                            </div>
+                            <div style={{flex: '0.9', paddingLeft: "1em"}}>
+                                {result.educations.map(education => {
+                                    return <div>
+                                        {education.degree + ", " + education.school}<br />
+                                    </div>
+                                })}
+                                <br />
+                                <b>{result.headline}</b> <br />
+                                {result.description}
+                                <br /><br />
+                                <Button variant="outlined" color="secondary" onClick={() => {
+                                    window.open('/tutor/' + result._id, '_self');
+                                }}>
+                                    view
+                                </Button>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    </div> 
+                })}
             </div>
         </div>
     </div>

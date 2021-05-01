@@ -101,4 +101,32 @@ module.exports = function (app) {
             changeOrigin: true,
         })
     );
+    app.use(
+        '/tutor/search',
+        createProxyMiddleware({
+            target: 'http://localhost:5000',
+            changeOrigin: true,
+        })
+    );
+    app.use(
+        '/tutor/register',
+        createProxyMiddleware({
+            target: 'http://localhost:5000',
+            changeOrigin: true,
+        })
+    );
+    app.use(
+        '/course/getRegisteredCourses',
+        createProxyMiddleware({
+            target: 'http://localhost:5000',
+            changeOrigin: true,
+        })
+    );
+    app.use(
+        '/course/getScheduledCourses',
+        createProxyMiddleware({
+            target: 'http://localhost:5000',
+            changeOrigin: true,
+        })
+    );
 };

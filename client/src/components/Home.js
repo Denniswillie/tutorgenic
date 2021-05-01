@@ -1,8 +1,9 @@
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import axios from 'axios';
 
 export default function Home(props) {
     const {setDisplayNavbar, setUser} = props;
+    const [sessions, setSessions] = useState([]);
     setDisplayNavbar(true);
     useEffect(() => {
         const ac = new AbortController();
@@ -15,6 +16,16 @@ export default function Home(props) {
                     const user = res.user;
                     console.log(user);
                     setUser(user);
+                    axios.get('/course/getRegisteredCourses')
+                        .then(res => res.data)
+                        .catch(err => console.log(err))
+                        .then(res => {
+                            if (res.success) {
+                                setSessions(res.result)
+                            } else {
+                                alert('Failed to get sessions');
+                            }
+                        })
                 } else {
                     window.open('/', '_self');
                 }
@@ -29,41 +40,29 @@ export default function Home(props) {
             <ul>
                 <li onClick={() => {
                     window.location.href = "#upcomingSessions";
-                }}>Upcoming sessions</li>
-                <li onClick={() => {
-                    window.location.href = "#pastSessions";
-                }}>Past sessions</li>
-                <li onClick={() => {
-                    window.location.href = "#savedTutors";
-                }}>Saved tutors</li>
+                }}>Sessions</li>
             </ul>
         </div>
         <div className="content">
             <div className="box">
                 <a name="upcomingSessions"></a>
                 <div className="box_top">
-                    <h2>Upcoming sessions</h2>
+                    <h2>Sessions</h2>
                 </div>
                 <div className="box_bottom">
-                    
-                </div>
-            </div>
-            <div className="box">
-                <a name="pastSessions"></a>
-                <div className="box_top">
-                    <h2>Past sessions</h2>
-                </div>
-                <div className="box_bottom">
-
-                </div>
-            </div>
-            <div className="box">
-                <a name="savedTutors"></a>
-                <div className="box_top">
-                    <h2>Saved tutors</h2>
-                </div>
-                <div className="box_bottom">
-
+                    {sessions.length === 0 && "Your sessions will appear here."}
+                    {sessions.map(session => {
+                        return <div className="box" style={{width: "40%"}}>
+                            <div className="box_top">
+                                <h2>{session.title}</h2>
+                            </div>
+                            <div className="box_bottom">
+                                <u style={{cursor: "pointer"}} onClick={() => {
+                                    window.open('/room/' + session.course_id, '_self');
+                                }}>Click this link to open the meeting</u>
+                            </div>
+                        </div>
+                    })}
                 </div>
             </div>
         </div>

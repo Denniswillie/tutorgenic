@@ -7,6 +7,41 @@ const router = require('express').Router();
 const db = require('../db');
 const inProduction = process.env.NODE_ENV === "production";
 
+router.post('/register', upload.none(), async (req, res) => {
+    const course_id = req.body.course_id;
+    try {
+        await db.query('insert into coursestudentrelationships (course_id, student_id) values($1, $2);', [course_id, req.user._id]);
+        res.send({
+            success: true
+        })
+    } catch (err) {
+        console.log(err);
+        res.send({
+            success: false
+        })
+    }
+})
+
+router.post('/search', upload.none(), async (req, res) => {
+    const search_value = req.body.search_value;
+    try {
+        const result = await db.query('select * from users where ($1 = ANY(tutoring_subjects)) or first_name = $2 or last_name = $3;', [
+            search_value,
+            search_value,
+            search_value
+        ]);
+        res.send({
+            success: true,
+            result: result.rows
+        })
+    } catch (err) {
+        console.log(err);
+        res.send({
+            success: false
+        })
+    }
+})
+
 router.get('/getSchedulesDetails', upload.none(), async (req, res) => {
     try {
         await db.query('select * from courses ')
@@ -29,8 +64,9 @@ router.post('/getSchedule', upload.none(), async (req, res) => {
                 dates_params += (" or date = $" + (i + 1));
             }
         }
+        const scheduler_id = req.body.tutor_id ? req.body.tutor_id : req.user._id;
         const query = 'select * from courses where (' + dates_params + ') and tutor_id = $' + (dates.length + 1) + ';';
-        const result = await db.query(query, [...dates, req.user._id]);
+        const result = await db.query(query, [...dates, scheduler_id]);
         res.send({
             success: true,
             result: result.rows
