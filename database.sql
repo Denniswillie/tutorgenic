@@ -89,7 +89,7 @@ create table Reviews (
 	student_id int NOT NULL,
 	rating DECIMAL(3, 1),
 	message TEXT
-)
+);
 
 CREATE TABLE session (
   "sid" varchar NOT NULL COLLATE "default",
