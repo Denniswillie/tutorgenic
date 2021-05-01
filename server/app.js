@@ -8,9 +8,12 @@ const multer = require('multer');
 const upload = multer();
 const passport = require('passport');
 const session = require('express-session');
+const sslRedirect = require('heroku-ssl-redirect').default;
 
 // passportSetup will use the pool first, and then will be handed to app.js.
 const db = require('./passportSetup');
+
+app.use(sslRedirect());
 
 const passportSocketIo = require('passport.socketio');
 const cookieParser = require('cookie-parser');
