@@ -9,7 +9,9 @@ const upload = multer();
 const passport = require('passport');
 const session = require('express-session');
 const sslRedirect = require('heroku-ssl-redirect').default;
+const path = require('path');
 console.log("this is the port: " + process.env.PORT);
+console.log("in production: " + inProduction);
 
 // passportSetup will use the pool first, and then will be handed to app.js.
 const db = require('./passportSetup');
@@ -24,6 +26,7 @@ const pgConfig = new pgSession({
     tableName: 'session'
 })
 
+if (inProduction) {
     app.use(express.static('client/build'));
     app.get('/home/*', (req, res) => {
         res.sendFile(path.join(__dirname, '../client/build/index.html'));
@@ -49,7 +52,7 @@ const pgConfig = new pgSession({
     app.get('/search/*', (req, res) => {
         res.sendFile(path.join(__dirname, '../client/build/index.html'));
     })
-
+}
 
 app.use(cookieParser())
 app.use(express.json());
