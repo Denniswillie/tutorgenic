@@ -27,31 +27,7 @@ const pgConfig = new pgSession({
 })
 
 if (inProduction) {
-    app.use(express.static('client/build'));
-    app.get('/home/*', (req, res) => {
-        res.sendFile(path.join(__dirname, '../client/build/index.html'));
-    })
-    app.get('/tutorDashboard/*', (req, res) => {
-        res.sendFile(path.join(__dirname, '../client/build/index.html'));
-    })
-    app.get('/apply/*', (req, res) => {
-        res.sendFile(path.join(__dirname, '../client/build/index.html'));
-    })
-    app.get('/admin/*', (req, res) => {
-        res.sendFile(path.join(__dirname, '../client/build/index.html'));
-    })
-    app.get('/googlefailure/*', (req, res) => {
-        res.sendFile(path.join(__dirname, '../client/build/index.html'));
-    })
-    app.get('/room/*', (req, res) => {
-        res.sendFile(path.join(__dirname, '../client/build/index.html'));
-    })
-    app.get('/tutor/*', (req, res) => {
-        res.sendFile(path.join(__dirname, '../client/build/index.html'));
-    })
-    app.get('/search/*', (req, res) => {
-        res.sendFile(path.join(__dirname, '../client/build/index.html'));
-    })
+
 }
 
 app.use(cookieParser())
