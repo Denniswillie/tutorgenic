@@ -2,7 +2,8 @@ require('dotenv').config({path: __dirname + '/../.env'});
 const express = require('express');
 const cors = require("cors");
 const app = express();
-const port = parseInt(process.env.PORT);
+const inProduction = process.env.NODE_ENV === "production";
+const port = inProduction ? parseInt(process.env.PORT) : 5000;
 const socket = require('socket.io');
 const multer = require('multer');
 const upload = multer();
@@ -22,6 +23,34 @@ const pgConfig = new pgSession({
     pool: db,
     tableName: 'session'
 })
+
+if (inProduction) {
+    app.use(express.static('client/build'));
+    app.get('/home/*', (req, res) => {
+        res.sendFile(path.join(__dirname, '../client/build/index.html'));
+    })
+    app.get('/tutorDashboard/*', (req, res) => {
+        res.sendFile(path.join(__dirname, '../client/build/index.html'));
+    })
+    app.get('/apply/*', (req, res) => {
+        res.sendFile(path.join(__dirname, '../client/build/index.html'));
+    })
+    app.get('/admin/*', (req, res) => {
+        res.sendFile(path.join(__dirname, '../client/build/index.html'));
+    })
+    app.get('/googlefailure/*', (req, res) => {
+        res.sendFile(path.join(__dirname, '../client/build/index.html'));
+    })
+    app.get('/room/*', (req, res) => {
+        res.sendFile(path.join(__dirname, '../client/build/index.html'));
+    })
+    app.get('/tutor/*', (req, res) => {
+        res.sendFile(path.join(__dirname, '../client/build/index.html'));
+    })
+    app.get('/search/*', (req, res) => {
+        res.sendFile(path.join(__dirname, '../client/build/index.html'));
+    })
+}
 
 app.use(cookieParser())
 app.use(express.json());
