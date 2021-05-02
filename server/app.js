@@ -3,7 +3,6 @@ const express = require('express');
 const cors = require("cors");
 const app = express();
 const inProduction = process.env.NODE_ENV === "production";
-const port = inProduction ? parseInt(process.env.PORT) : 5000;
 const socket = require('socket.io');
 const multer = require('multer');
 const upload = multer();
@@ -89,7 +88,7 @@ app.use('/tutor', require('./routes/tutor'));
 app.use('/course', require('./routes/course'));
 app.use('/room', require('./routes/room'));
 
-const server = app.listen(port);
+const server = app.listen(process.env.PORT || 5000);
 
 const io = socket(server, {
     cors: {
