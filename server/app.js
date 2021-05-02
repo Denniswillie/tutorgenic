@@ -89,7 +89,7 @@ app.use('/tutor', require('./routes/tutor'));
 app.use('/course', require('./routes/course'));
 app.use('/room', require('./routes/room'));
 
-const server = app.listen(process.env.PORT || 5000);
+const server = app.listen(process.env.PORT);
 
 const io = socket(server, {
     cors: {
