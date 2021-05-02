@@ -24,7 +24,6 @@ const pgConfig = new pgSession({
     tableName: 'session'
 })
 
-if (inProduction) {
     app.use(express.static('client/build'));
     app.get('/home/*', (req, res) => {
         res.sendFile(path.join(__dirname, '../client/build/index.html'));
@@ -50,7 +49,7 @@ if (inProduction) {
     app.get('/search/*', (req, res) => {
         res.sendFile(path.join(__dirname, '../client/build/index.html'));
     })
-}
+
 
 app.use(cookieParser())
 app.use(express.json());
