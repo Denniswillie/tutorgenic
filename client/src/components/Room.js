@@ -6,7 +6,7 @@ import Cookies from 'js-cookie';
 export default function ApplyTutor(props) {
     const {setDisplayNavbar, setUser, courseId} = props;
     const [remoteStreams, setRemoteStreams] = useState([]);
-    
+
     setDisplayNavbar(true);
     useEffect(() => {
         const ac = new AbortController();
@@ -33,7 +33,7 @@ export default function ApplyTutor(props) {
                         audio: true
                     })
                     document.querySelector('#localVideo').srcObject = localStream;
-                    const socket = io.connect("http://localhost:5000", {
+                    const socket = io.connect("https://www.tutorgenic.com", {
                         query: 'session_id=' + Cookies.get('connect.sid').replace('s:','').split('.')[0]
                     });
 
@@ -73,7 +73,7 @@ export default function ApplyTutor(props) {
                                             content: event.candidate.toJSON()
                                         })
                                     })
-        
+
                                     const offer = await peerConnection.createOffer();
                                     await peerConnection.setLocalDescription(offer);
                                     const roomWithOffer = {
@@ -84,8 +84,8 @@ export default function ApplyTutor(props) {
                                         from: user._id,
                                         destination: newClientId,
                                         content: roomWithOffer
-                                    })    
-                                    
+                                    })
+
                                     socket.on('answer', async (answer) => {
                                         const {from, destination, content} = answer;
                                         if (from === newClientId && destination === user._id) {
@@ -93,7 +93,7 @@ export default function ApplyTutor(props) {
                                             await peerConnection.setRemoteDescription(rtcSessionDescription);
                                         }
                                     })
-        
+
                                     socket.on('calleeCandidates', async (icecandidate) => {
                                         const {from, content} = icecandidate;
                                         if (from === newClientId) {
@@ -120,7 +120,7 @@ export default function ApplyTutor(props) {
                                             remoteStream.addTrack(track);
                                         })
                                     })
-                                    
+
                                     peerConnection.addEventListener('icecandidate', event => {
                                         if (!event.candidate) {
                                             return;
