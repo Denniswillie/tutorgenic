@@ -40,12 +40,6 @@ export default function ApplyTutor(props) {
                     socket.emit('courseId', courseId);
 
                     socket.on('newclient', async (newClientId) => {
-                        socket.off('callerPing');
-                        socket.off('calleePing');
-                        socket.off('callerCandidates');
-                        socket.off('calleeCandidates');
-                        socket.off('answer');
-                        socket.off('offer');
                         const peerConnection = new RTCPeerConnection(configuration);
                         localStream.getTracks().forEach(track => {
                             peerConnection.addTrack(track, localStream);
@@ -60,14 +54,10 @@ export default function ApplyTutor(props) {
 
                             socket.on('calleePing', async (msg) => {
                                 if (msg.destination == user._id && msg.from === newClientId) {
-                                    console.log('calleePing');
                                     const remoteStream = new MediaStream();
                                     setRemoteStreams(prevData => {
                                         return [...prevData, remoteStream];
                                     })
-                                    const temp = document.createElement("video");
-                                    temp.srcObject = remoteStream;
-                                    document.getElementById('videos').appendChild(temp);
                                     peerConnection.addEventListener('track', event => {
                                         event.streams[0].getTracks().forEach(track => {
                                             remoteStream.addTrack(track);
@@ -127,9 +117,6 @@ export default function ApplyTutor(props) {
                                     setRemoteStreams(prevData => {
                                         return [...prevData, remoteStream];
                                     })
-                                    const temp = document.createElement("video");
-                                    temp.srcObject = remoteStream;
-                                    document.getElementById('videos').appendChild(temp);
                                     peerConnection.addEventListener('track', event => {
                                         event.streams[0].getTracks().forEach(track => {
                                             remoteStream.addTrack(track);
@@ -186,24 +173,17 @@ export default function ApplyTutor(props) {
         }
     }, [setUser])
 
-    // URL.createObjectURL(mediaStream)
-    // <video ref={video => {video.srcObject = remoteStream;}} autoPlay playsInLine></video><br />
-    // {remoteStreams.map(remoteStream => {
-    //     console.log(remoteStream)
-    //     return <div>
-    //         <video src={URL.createObjectURL(remoteStream)} /><br />
-    //     </div>;
-    // })}
-
     return <div className="wrapper">
         <div className="content" style={{flex: "0.75"}}>
 
         </div>
         <div className="sidebar" style={{flex: "0.25", overflow: "auto"}}>
             <video id="localVideo" muted autoPlay playsInLine></video><br />
-            <div id="videos">
-
-            </div>
+            {remoteStreams.map(remoteStream => {
+                return <div>
+                    <video ref={video => {video.srcObject = remoteStream;}} autoPlay playsInLine></video><br />
+                </div>;
+            })}
         </div>
     </div>
 }
