@@ -122,36 +122,38 @@ io.use(passportSocketIo.authorize({
 
 io.on('connection', async (socket) => {
     const user = socket.request.user;
+    var roomId;
     socket.on('courseId', courseId => {
-        socket.join(courseId.toString());
-        const numOfClients = io.sockets.adapter.rooms.get(courseId.toString()).size;
+        roomId = courseId.toString();
+        socket.join(roomId);
+        const numOfClients = io.sockets.adapter.rooms.get(roomId).size;
         if (numOfClients > 1) {
-            io.emit('newclient', user._id);
+            io.in(roomId).emit('newclient', user._id);
         }
     })
 
     socket.on('callerPing', ping => {
-        io.emit('callerPing', ping);
+        socket.to(roomId).emit('callerPing', ping);
     })
 
     socket.on('calleePing', ping => {
-        io.emit('calleePing', ping);
+        socket.to(roomId).emit('calleePing', ping);
     })
 
     socket.on('offer', offer => {
-        io.emit('offer', offer);
+        socket.to(roomId).emit('offer', offer);
     })
 
     socket.on('answer', answer => {
-        io.emit('answer', answer);
+        socket.to(roomId).emit('answer', answer);
     })
 
     socket.on('callerCandidates', callerCandidates => {
-        io.emit('callerCandidates', callerCandidates);
+        socket.to(roomId).emit('callerCandidates', callerCandidates);
     })
 
     socket.on('calleeCandidates', calleeCandidates => {
-        io.emit('calleeCandidates', calleeCandidates);
+        socket.to(roomId).emit('calleeCandidates', calleeCandidates);
     })
 
     // format:

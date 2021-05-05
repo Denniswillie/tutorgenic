@@ -44,7 +44,7 @@ export default function ApplyTutor(props) {
                         localStream.getTracks().forEach(track => {
                             peerConnection.addTrack(track, localStream);
                         })
-                        if (newClientId !== res.user._id) {
+                        if (newClientId !== user._id) {
                             // as caller
                             socket.emit('callerPing', {
                                 from: user._id,
