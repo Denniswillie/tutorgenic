@@ -35,9 +35,9 @@ create table Users (
 	image_url text
 );
 
-INSERT INTO users (first_name, last_name, email, password, is_tutor, is_admin, is_verified, image_url) values('Dennis', 'Willie', 'denniswillie2000@gmail.com', '$2b$05$GyEudUu/3wNxtq9vX6yUD.mQybpclvST2Bqe5GsYGF22TGdMBqv/6', 't', 't', 't', 'https://lh3.googleusercontent.com/proxy/7EUlYrg9AvdJxHv8KSYIzdU_CqxWUcCsGNQGtFMcBOQ6qyr4lNivh4EXKGEUgcLPw4DXsLk4LIx9QfPxFxcZFX8-ZhL6XTKMp4KVrim_4mO9g-OpqD8kEg');
-INSERT INTO users (first_name, last_name, email, password, is_tutor, is_admin, is_verified, image_url) values('Mark', 'Jefferson', 'jeffersonhandojo@gmail.com', '$2b$05$GyEudUu/3wNxtq9vX6yUD.mQybpclvST2Bqe5GsYGF22TGdMBqv/6', 't', 't', 't', 'https://lh3.googleusercontent.com/proxy/7EUlYrg9AvdJxHv8KSYIzdU_CqxWUcCsGNQGtFMcBOQ6qyr4lNivh4EXKGEUgcLPw4DXsLk4LIx9QfPxFxcZFX8-ZhL6XTKMp4KVrim_4mO9g-OpqD8kEg');
-INSERT INTO users (first_name, last_name, email, password, is_tutor, is_admin, is_verified, image_url) values('Felix', 'Xavier', 'xavier.felix222@gmail.com', '$2b$05$GyEudUu/3wNxtq9vX6yUD.mQybpclvST2Bqe5GsYGF22TGdMBqv/6', 't', 't', 't', 'https://lh3.googleusercontent.com/proxy/7EUlYrg9AvdJxHv8KSYIzdU_CqxWUcCsGNQGtFMcBOQ6qyr4lNivh4EXKGEUgcLPw4DXsLk4LIx9QfPxFxcZFX8-ZhL6XTKMp4KVrim_4mO9g-OpqD8kEg');
+INSERT INTO users (first_name, last_name, email, password, is_tutor, is_admin, is_verified, image_url) values('Dennis', 'Willie', 'denniswillie2000@gmail.com', '$2b$05$GyEudUu/3wNxtq9vX6yUD.mQybpclvST2Bqe5GsYGF22TGdMBqv/6', 't', 't', 't', 'https://www.pngitem.com/pimgs/m/150-1503945_transparent-user-png-default-user-image-png-png.png');
+INSERT INTO users (first_name, last_name, email, password, is_tutor, is_admin, is_verified, image_url) values('Mark', 'Jefferson', 'jeffersonhandojo@gmail.com', '$2b$05$GyEudUu/3wNxtq9vX6yUD.mQybpclvST2Bqe5GsYGF22TGdMBqv/6', 't', 't', 't', 'https://www.pngitem.com/pimgs/m/150-1503945_transparent-user-png-default-user-image-png-png.png');
+INSERT INTO users (first_name, last_name, email, password, is_tutor, is_admin, is_verified, image_url) values('Felix', 'Xavier', 'xavier.felix222@gmail.com', '$2b$05$GyEudUu/3wNxtq9vX6yUD.mQybpclvST2Bqe5GsYGF22TGdMBqv/6', 't', 't', 't', 'https://www.pngitem.com/pimgs/m/150-1503945_transparent-user-png-default-user-image-png-png.png');
 
 create table TutorsApplications (
 	applicant_id int NOT NULL,
