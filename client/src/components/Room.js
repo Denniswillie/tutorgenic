@@ -190,6 +190,7 @@ export default function ApplyTutor(props) {
         <div className="sidebar" style={{flex: "0.25", overflow: "auto"}}>
             <video id="localVideo" muted autoPlay playsInLine></video><br />
             {remoteStreams.map(remoteStream => {
+                console.log(remoteStream)
                 return <div>
                     <video src={URL.createObjectURL(remoteStream)} /><br />
                 </div>;
