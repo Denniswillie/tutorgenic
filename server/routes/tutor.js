@@ -25,10 +25,10 @@ router.post('/register', upload.none(), async (req, res) => {
 router.post('/search', upload.none(), async (req, res) => {
     const search_value = req.body.search_value;
     try {
-        const result = await db.query('select * from users where ($1 = ANY(tutoring_subjects)) or first_name = $2 or last_name = $3;', [
+        const result = await db.query("select * from users where (lower($1) = ANY(lower(tutoring_subjects::varchar(50))::varchar(50)[])) or lower(first_name) like lower($2) or lower(last_name) like lower($3);", [
             search_value,
-            search_value,
-            search_value
+            search_value + "%",
+            search_value + "%"
         ]);
         res.send({
             success: true,
