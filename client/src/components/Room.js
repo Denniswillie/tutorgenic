@@ -180,6 +180,9 @@ export default function ApplyTutor(props) {
         }
     }, [setUser])
 
+    // URL.createObjectURL(mediaStream)
+    // <video ref={video => {video.srcObject = remoteStream;}} autoPlay playsInLine></video><br />
+
     return <div className="wrapper">
         <div className="content" style={{flex: "0.75"}}>
 
@@ -188,7 +191,7 @@ export default function ApplyTutor(props) {
             <video id="localVideo" muted autoPlay playsInLine></video><br />
             {remoteStreams.map(remoteStream => {
                 return <div>
-                    <video ref={video => {video.srcObject = remoteStream;}} autoPlay playsInLine></video><br />
+                    <video src={URL.createObjectURL(remoteStream)} /><br />
                 </div>;
             })}
         </div>
