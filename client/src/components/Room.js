@@ -40,6 +40,7 @@ export default function ApplyTutor(props) {
                     socket.emit('courseId', courseId);
 
                     socket.on('newclient', async (newClientId) => {
+                        await socket.removeAllListeners();
                         const peerConnection = new RTCPeerConnection(configuration);
                         localStream.getTracks().forEach(track => {
                             peerConnection.addTrack(track, localStream);
