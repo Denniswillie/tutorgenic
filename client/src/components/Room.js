@@ -40,12 +40,12 @@ export default function ApplyTutor(props) {
                     socket.emit('courseId', courseId);
 
                     socket.on('newclient', async (newClientId) => {
-                        await socket.removeAllListeners();
                         const peerConnection = new RTCPeerConnection(configuration);
                         localStream.getTracks().forEach(track => {
                             peerConnection.addTrack(track, localStream);
                         })
                         if (newClientId !== user._id) {
+                            console.log('as a caller')
                             // as caller
                             socket.emit('callerPing', {
                                 from: user._id,
@@ -104,6 +104,7 @@ export default function ApplyTutor(props) {
                                 }
                             })
                         } else {
+                            console.log('as a callee')
                             socket.on('callerPing', msg => {
                                 if (msg.destination === user._id) {
                                     const callerId = msg.from;
