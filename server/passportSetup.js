@@ -4,7 +4,7 @@ require('dotenv').config({
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const inProduction = process.env.NODE_ENV === "production";
-const AUTH_REDIRECT_URL = inProduction ? process.env.DOMAIN_NAME : process.env.CLIENT_URL;
+const AUTH_REDIRECT_URL = inProduction ? process.env.CLIENT_URL : process.env.DEV_CLIENT_URL;
 const db = require('./db');
 const bcrypt = require('bcrypt');
 const LocalStrategy = require('passport-local').Strategy;
