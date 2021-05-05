@@ -40,6 +40,12 @@ export default function ApplyTutor(props) {
                     socket.emit('courseId', courseId);
 
                     socket.on('newclient', async (newClientId) => {
+                        socket.off('callerPing');
+                        socket.off('calleePing');
+                        socket.off('callerCandidates');
+                        socket.off('calleeCandidates');
+                        socket.off('answer');
+                        socket.off('offer');
                         const peerConnection = new RTCPeerConnection(configuration);
                         localStream.getTracks().forEach(track => {
                             peerConnection.addTrack(track, localStream);
@@ -54,6 +60,7 @@ export default function ApplyTutor(props) {
 
                             socket.on('calleePing', async (msg) => {
                                 if (msg.destination == user._id && msg.from === newClientId) {
+                                    console.log('calleePing');
                                     const remoteStream = new MediaStream();
                                     setRemoteStreams(prevData => {
                                         return [...prevData, remoteStream];
