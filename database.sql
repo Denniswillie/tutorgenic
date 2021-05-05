@@ -140,4 +140,4 @@ begin
 			found_imageurl := data.image_url;
 			return next; 
 		end loop;
-end; $$
+end; $$;
