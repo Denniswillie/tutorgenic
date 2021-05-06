@@ -60,7 +60,8 @@ export default function ApplyTutor(props) {
                                     //     return [...prevData, remoteStream];
                                     // })
                                     const temp = document.createElement('video');
-                                    temp.srcObject = remoteStream;
+                                    temp.src = URL.createObjectURL(remoteStream);
+                                    
 
                                     const localIceCandidates = [];
 
@@ -143,7 +144,7 @@ export default function ApplyTutor(props) {
                                     //     return [...prevData, remoteStream];
                                     // })
                                     const temp = document.createElement('video');
-                                    temp.srcObject = remoteStream;
+                                    temp.src = URL.createObjectURL(remoteStream);
 
                                     peerConnection.addEventListener('connectionstatechange', () => {
                                         if (peerConnection.connectionState === "connected") {
