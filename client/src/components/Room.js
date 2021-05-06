@@ -180,6 +180,7 @@ export default function ApplyTutor(props) {
         <div className="sidebar" style={{flex: "0.25", overflow: "auto"}}>
             <video id="localVideo" muted autoPlay playsInLine></video><br />
             {remoteStreams.map(remoteStream => {
+                console.log('remote');
                 return <div>
                     <video ref={video => {video.srcObject = remoteStream;}} autoPlay playsInLine></video><br />
                 </div>;
