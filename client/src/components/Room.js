@@ -102,6 +102,7 @@ export default function ApplyTutor(props) {
                                         const {from, destination, content} = answer;
                                         if (from === newClientId && destination === user._id) {
                                             const rtcSessionDescription = new RTCSessionDescription(content);
+                                            console.log(content);
                                             await peerConnection.setRemoteDescription(rtcSessionDescription);
                                             answered = true;
                                             for (var i = 0; i < localIceCandidates.length; i++) {
@@ -166,6 +167,7 @@ export default function ApplyTutor(props) {
                                     socket.on('offer', async (offer) => {
                                         const {from, destination, content} = offer;
                                         if (from === callerId && destination === user._id) {
+                                            console.log(content);
                                             await peerConnection.setRemoteDescription(new RTCSessionDescription(content));
                                             const answer = await peerConnection.createAnswer();
                                             await peerConnection.setLocalDescription(answer);
