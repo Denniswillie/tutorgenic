@@ -54,6 +54,7 @@ export default function ApplyTutor(props) {
 
                             socket.on('calleePing', async (msg) => {
                                 if (msg.destination == user._id && msg.from === newClientId) {
+                                    var answered = false;
                                     const remoteStream = new MediaStream();
                                     // setRemoteStreams(prevData => {
                                     //     return [...prevData, remoteStream];
@@ -61,6 +62,8 @@ export default function ApplyTutor(props) {
                                     const temp = document.createElement('video');
                                     temp.srcObject = remoteStream;
                                     document.getElementById('videos').appendChild(temp);
+
+                                    const localIceCandidates = [];
 
                                     peerConnection.addEventListener('track', event => {
                                         event.streams[0].getTracks().forEach(track => {
@@ -72,11 +75,15 @@ export default function ApplyTutor(props) {
                                         if (!event.candidate) {
                                             return;
                                         }
-                                        socket.emit('callerCandidates', {
-                                            from: user._id,
-                                            destination: newClientId,
-                                            content: event.candidate.toJSON()
-                                        })
+                                        if (answered) {
+                                            socket.emit('callerCandidates', {
+                                                from: user._id,
+                                                destination: newClientId,
+                                                content: event.candidate.toJSON()
+                                            })
+                                        } else {
+                                            localIceCandidates.push(event.candidate.toJSON());
+                                        }
                                     })
 
                                     const offer = await peerConnection.createOffer();
@@ -96,13 +103,21 @@ export default function ApplyTutor(props) {
                                         if (from === newClientId && destination === user._id) {
                                             const rtcSessionDescription = new RTCSessionDescription(content);
                                             await peerConnection.setRemoteDescription(rtcSessionDescription);
+                                            answered = true;
+                                            for (var i = 0; i < localIceCandidates.length; i++) {
+                                                socket.emit('callerCandidates', {
+                                                    from: user._id,
+                                                    destination: newClientId,
+                                                    content: localIceCandidates[i]
+                                                })
+                                            }
                                         }
                                     })
 
                                     socket.on('calleeCandidates', async (icecandidate) => {
-                                        const {from, content} = icecandidate;
-                                        if (from === newClientId) {
-                                            await peerConnection.addIceCandidate(new RTCIceCandidate(content))
+                                        const {from, content, destination} = icecandidate;
+                                        if (from === newClientId && destination === user._id) {
+                                            await peerConnection.addIceCandidate(new RTCIceCandidate(content));
                                         }
                                     })
                                 }
@@ -130,15 +145,22 @@ export default function ApplyTutor(props) {
                                         })
                                     })
 
+                                    const localIceCandidates = [];
+                                    var doneNegotiation = false;
+
                                     peerConnection.addEventListener('icecandidate', event => {
                                         if (!event.candidate) {
                                             return;
                                         }
-                                        socket.emit('calleeCandidates', {
-                                            from: user._id,
-                                            destination: callerId,
-                                            content: event.candidate.toJSON()
-                                        })
+                                        if (doneNegotiation) {
+                                            socket.emit('calleeCandidates', {
+                                                from: user._id,
+                                                destination: callerId,
+                                                content: event.candidate.toJSON()
+                                            })
+                                        } else {
+                                            localIceCandidates.push(event.candidate.toJSON())
+                                        }
                                     })
 
                                     socket.on('offer', async (offer) => {
@@ -165,6 +187,14 @@ export default function ApplyTutor(props) {
                                         const {from, destination, content} = icecandidate;
                                         if (from === callerId && destination === user._id) {
                                             await peerConnection.addIceCandidate(new RTCIceCandidate(content));
+                                            doneNegotiation = true;
+                                            for (var i = 0; i < localIceCandidates.length; i++) {
+                                                socket.emit('calleeCandidates', {
+                                                    from: user._id,
+                                                    destination: callerId,
+                                                    content: localIceCandidates[i]
+                                                })
+                                            }
                                         }
                                     })
                                 }
