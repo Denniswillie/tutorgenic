@@ -155,33 +155,4 @@ io.on('connection', async (socket) => {
     socket.on('calleeCandidates', calleeCandidates => {
         socket.to(roomId).emit('calleeCandidates', calleeCandidates);
     })
-
-    // format:
-    // offer = {
-    //     destination: userId,
-    //     from: userId,
-    //     content: content
-    // }
-    // answer = {
-    //     destination: userId,
-    //     from: userId,
-    //     content: content
-    // }
-    // icecandidate = {
-    //     destination: userId,
-    //     from: userId,
-    //     content: content
-    // }
-
-    socket.on('offer', offer => {
-        io.emit('offer', offer);
-    })
-
-    socket.on('answer', answer => {
-        io.emit('answer', answer);
-    })
-
-    socket.on('icecandidate', icecandidate => {
-        io.emit('icecandidate', icecandidate);
-    })
 })
