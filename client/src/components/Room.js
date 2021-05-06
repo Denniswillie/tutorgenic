@@ -61,9 +61,14 @@ export default function ApplyTutor(props) {
                                     // })
                                     const temp = document.createElement('video');
                                     temp.srcObject = remoteStream;
-                                    document.getElementById('videos').appendChild(temp);
 
                                     const localIceCandidates = [];
+
+                                    peerConnection.addEventListener('connectionstatechange', () => {
+                                        if (peerConnection.connectionState === "connected") {
+                                            document.getElementById('videos').appendChild(temp);
+                                        }
+                                    });
 
                                     peerConnection.addEventListener('track', event => {
                                         event.streams[0].getTracks().forEach(track => {
@@ -139,7 +144,13 @@ export default function ApplyTutor(props) {
                                     // })
                                     const temp = document.createElement('video');
                                     temp.srcObject = remoteStream;
-                                    document.getElementById('videos').appendChild(temp);
+
+                                    peerConnection.addEventListener('connectionstatechange', () => {
+                                        if (peerConnection.connectionState === "connected") {
+                                            document.getElementById('videos').appendChild(temp);
+                                        }
+                                    });
+
                                     peerConnection.addEventListener('track', event => {
                                         event.streams[0].getTracks().forEach(track => {
                                             remoteStream.addTrack(track);
