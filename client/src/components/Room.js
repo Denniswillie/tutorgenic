@@ -56,18 +56,18 @@ export default function ApplyTutor(props) {
                                 if (msg.destination == user._id && msg.from === newClientId) {
                                     var answered = false;
                                     const remoteStream = new MediaStream();
-                                    // setRemoteStreams(prevData => {
-                                    //     return [...prevData, remoteStream];
-                                    // })
-                                    const temp = document.createElement('video');
-                                    temp.src = URL.createObjectURL(remoteStream);
-                                    
+                                    setRemoteStreams(prevData => {
+                                        return [...prevData, remoteStream];
+                                    })
+                                    // const temp = document.createElement('video');
+                                    // temp.srcObject = remoteStream;
 
                                     const localIceCandidates = [];
 
                                     peerConnection.addEventListener('connectionstatechange', () => {
                                         if (peerConnection.connectionState === "connected") {
-                                            document.getElementById('videos').appendChild(temp);
+                                            // document.getElementById('videos').appendChild(temp);
+                                            console.log('connected');
                                         }
                                     });
 
@@ -140,15 +140,16 @@ export default function ApplyTutor(props) {
                                     })
 
                                     const remoteStream = new MediaStream();
-                                    // setRemoteStreams(prevData => {
-                                    //     return [...prevData, remoteStream];
-                                    // })
-                                    const temp = document.createElement('video');
-                                    temp.src = URL.createObjectURL(remoteStream);
+                                    setRemoteStreams(prevData => {
+                                        return [...prevData, remoteStream];
+                                    })
+                                    // const temp = document.createElement('video');
+                                    // temp.srcObject = remoteStream;
 
                                     peerConnection.addEventListener('connectionstatechange', () => {
                                         if (peerConnection.connectionState === "connected") {
-                                            document.getElementById('videos').appendChild(temp);
+                                            // document.getElementById('videos').appendChild(temp);
+                                            console.log('connected');
                                         }
                                     });
 
@@ -224,23 +225,17 @@ export default function ApplyTutor(props) {
         }
     }, [setUser])
 
-    // {remoteStreams.map(remoteStream => {
-    //     console.log('remote');
-    //     return <div>
-    //         <video ref={video => {video.srcObject = remoteStream;}} autoPlay playsInLine></video><br />
-    //     </div>;
-    // })}
-
     return <div className="wrapper">
         <div className="content" style={{flex: "0.75"}}>
 
         </div>
         <div className="sidebar" style={{flex: "0.25", overflow: "auto"}}>
             <video id="localVideo" muted autoPlay playsInLine></video><br />
-            
-            <div id="videos">
-
-            </div>
+            {remoteStreams.map(remoteStream => {
+                return <div>
+                    <video ref={video => {video.srcObject = remoteStream;}} autoPlay playsInLine></video><br />
+                </div>;
+            })}
         </div>
     </div>
 }
