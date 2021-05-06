@@ -55,9 +55,13 @@ export default function ApplyTutor(props) {
                             socket.on('calleePing', async (msg) => {
                                 if (msg.destination == user._id && msg.from === newClientId) {
                                     const remoteStream = new MediaStream();
-                                    setRemoteStreams(prevData => {
-                                        return [...prevData, remoteStream];
-                                    })
+                                    // setRemoteStreams(prevData => {
+                                    //     return [...prevData, remoteStream];
+                                    // })
+                                    const temp = document.createElement('video');
+                                    temp.srcObject = remoteStream;
+                                    document.getElementById('videos').appendChild(temp);
+
                                     peerConnection.addEventListener('track', event => {
                                         event.streams[0].getTracks().forEach(track => {
                                             remoteStream.addTrack(track);
@@ -114,9 +118,12 @@ export default function ApplyTutor(props) {
                                     })
 
                                     const remoteStream = new MediaStream();
-                                    setRemoteStreams(prevData => {
-                                        return [...prevData, remoteStream];
-                                    })
+                                    // setRemoteStreams(prevData => {
+                                    //     return [...prevData, remoteStream];
+                                    // })
+                                    const temp = document.createElement('video');
+                                    temp.srcObject = remoteStream;
+                                    document.getElementById('videos').appendChild(temp);
                                     peerConnection.addEventListener('track', event => {
                                         event.streams[0].getTracks().forEach(track => {
                                             remoteStream.addTrack(track);
@@ -173,18 +180,23 @@ export default function ApplyTutor(props) {
         }
     }, [setUser])
 
+    // {remoteStreams.map(remoteStream => {
+    //     console.log('remote');
+    //     return <div>
+    //         <video ref={video => {video.srcObject = remoteStream;}} autoPlay playsInLine></video><br />
+    //     </div>;
+    // })}
+
     return <div className="wrapper">
         <div className="content" style={{flex: "0.75"}}>
 
         </div>
         <div className="sidebar" style={{flex: "0.25", overflow: "auto"}}>
             <video id="localVideo" muted autoPlay playsInLine></video><br />
-            {remoteStreams.map(remoteStream => {
-                console.log('remote');
-                return <div>
-                    <video ref={video => {video.srcObject = remoteStream;}} autoPlay playsInLine></video><br />
-                </div>;
-            })}
+            
+            <div id="videos">
+
+            </div>
         </div>
     </div>
 }
