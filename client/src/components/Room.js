@@ -296,7 +296,7 @@ export default function ApplyTutor(props) {
                         }
                     })
 
-                    socket.on('disconnect', (userId) => {
+                    socket.on('disconnected', (userId) => {
                         for (var i = 0; i < videoRefs.length; i++) {
                             if (videoRefs[i].userId && videoRefs[i].userId === userId) {
                                 videoRefs[i].ref.current.style.display = "none";
