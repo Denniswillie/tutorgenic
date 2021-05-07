@@ -7,12 +7,46 @@ export default function ApplyTutor(props) {
     const {setDisplayNavbar, setUser, courseId} = props;
     const [remoteStreams, setRemoteStreams] = useState([]);
     const videoRefs = [];
-    for (var i = 0; i < 30; i++) {
-        videoRefs.push({
-            ref: useRef(),
-            activated: false
-        })
-    }
+    videoRefs.push({
+        ref: useRef(),
+        activated: false
+    })
+    videoRefs.push({
+        ref: useRef(),
+        activated: false
+    })
+    videoRefs.push({
+        ref: useRef(),
+        activated: false
+    })
+    videoRefs.push({
+        ref: useRef(),
+        activated: false
+    })
+    videoRefs.push({
+        ref: useRef(),
+        activated: false
+    })
+    videoRefs.push({
+        ref: useRef(),
+        activated: false
+    })
+    videoRefs.push({
+        ref: useRef(),
+        activated: false
+    })
+    videoRefs.push({
+        ref: useRef(),
+        activated: false
+    })
+    videoRefs.push({
+        ref: useRef(),
+        activated: false
+    })
+    videoRefs.push({
+        ref: useRef(),
+        activated: false
+    })
 
     const index = useRef();
     index.current = 0;
