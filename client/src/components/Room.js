@@ -84,14 +84,14 @@ export default function ApplyTutor(props) {
                     socket.emit('courseId', courseId);
 
                     socket.on('newclient', async (newClientId) => {
-                        const curr_index = index.current;
-                        index.current++;
-                        const peerConnection = new RTCPeerConnection(configuration);
-                        localStream.getTracks().forEach(track => {
-                            peerConnection.addTrack(track, localStream);
-                        })
                         if (newClientId !== user._id) {
                             console.log('as a caller')
+                            const peerConnection = new RTCPeerConnection(configuration);
+                            localStream.getTracks().forEach(track => {
+                                peerConnection.addTrack(track, localStream);
+                            })
+                            const curr_index = index.current;
+                            index.current++;
                             // as caller
                             socket.emit('callerPing', {
                                 from: user._id,
@@ -178,92 +178,97 @@ export default function ApplyTutor(props) {
                                     })
                                 }
                             })
-                        } else {
-                            console.log('as a callee')
-                            socket.on('callerPing', msg => {
-                                if (msg.destination === user._id) {
-                                    const callerId = msg.from;
-                                    socket.emit('calleePing', {
+                        } 
+                    })
+
+                    socket.on('callerPing', msg => {
+                        if (msg.destination === user._id) {
+                            const peerConnection = new RTCPeerConnection(configuration);
+                            localStream.getTracks().forEach(track => {
+                                peerConnection.addTrack(track, localStream);
+                            })
+                            const curr_index = index.current;
+                            index.current++;
+                            const callerId = msg.from;
+                            socket.emit('calleePing', {
+                                from: user._id,
+                                destination: callerId
+                            })
+
+                            const remoteStream = new MediaStream();
+                            // setRemoteStreams(prevData => {
+                            //     return [...prevData, remoteStream];
+                            // })
+                            // const temp = document.createElement('video');
+                            // temp.srcObject = remoteStream;
+
+                            videoRefs[curr_index].ref.current.style.display = "";
+                            videoRefs[curr_index].ref.current.srcObject = remoteStream;
+
+                            peerConnection.addEventListener('connectionstatechange', () => {
+                                if (peerConnection.connectionState === "connected") {
+                                    // document.getElementById('videos').appendChild(temp);
+                                    console.log('connected');
+                                }
+                            });
+
+                            peerConnection.addEventListener('track', event => {
+                                event.streams[0].getTracks().forEach(track => {
+                                    remoteStream.addTrack(track);
+                                })
+                            })
+
+                            const localIceCandidates = [];
+                            var doneNegotiation = false;
+
+                            peerConnection.addEventListener('icecandidate', event => {
+                                if (!event.candidate) {
+                                    return;
+                                }
+                                if (doneNegotiation) {
+                                    socket.emit('calleeCandidates', {
                                         from: user._id,
-                                        destination: callerId
+                                        destination: callerId,
+                                        content: event.candidate.toJSON()
                                     })
+                                } else {
+                                    localIceCandidates.push(event.candidate.toJSON())
+                                }
+                            })
 
-                                    const remoteStream = new MediaStream();
-                                    // setRemoteStreams(prevData => {
-                                    //     return [...prevData, remoteStream];
-                                    // })
-                                    // const temp = document.createElement('video');
-                                    // temp.srcObject = remoteStream;
+                            socket.on('offer', async (offer) => {
+                                const {from, destination, content} = offer;
+                                if (from === callerId && destination === user._id) {
+                                    console.log(content);
+                                    await peerConnection.setRemoteDescription(new RTCSessionDescription(content));
+                                    const answer = await peerConnection.createAnswer();
+                                    await peerConnection.setLocalDescription(answer);
 
-                                    videoRefs[curr_index].ref.current.style.display = "";
-                                    videoRefs[curr_index].ref.current.srcObject = remoteStream;
+                                    const roomWithAnswer = {
+                                        type: answer.type,
+                                        sdp: answer.sdp
+                                    }
 
-                                    peerConnection.addEventListener('connectionstatechange', () => {
-                                        if (peerConnection.connectionState === "connected") {
-                                            // document.getElementById('videos').appendChild(temp);
-                                            console.log('connected');
-                                        }
-                                    });
+                                    socket.emit('answer', {
+                                        from: user._id,
+                                        destination: callerId,
+                                        content: roomWithAnswer
+                                    })
+                                }
+                            })
 
-                                    peerConnection.addEventListener('track', event => {
-                                        event.streams[0].getTracks().forEach(track => {
-                                            remoteStream.addTrack(track);
+                            socket.on('callerCandidates', async (icecandidate) => {
+                                const {from, destination, content} = icecandidate;
+                                if (from === callerId && destination === user._id) {
+                                    await peerConnection.addIceCandidate(new RTCIceCandidate(content));
+                                    doneNegotiation = true;
+                                    for (var i = 0; i < localIceCandidates.length; i++) {
+                                        socket.emit('calleeCandidates', {
+                                            from: user._id,
+                                            destination: callerId,
+                                            content: localIceCandidates[i]
                                         })
-                                    })
-
-                                    const localIceCandidates = [];
-                                    var doneNegotiation = false;
-
-                                    peerConnection.addEventListener('icecandidate', event => {
-                                        if (!event.candidate) {
-                                            return;
-                                        }
-                                        if (doneNegotiation) {
-                                            socket.emit('calleeCandidates', {
-                                                from: user._id,
-                                                destination: callerId,
-                                                content: event.candidate.toJSON()
-                                            })
-                                        } else {
-                                            localIceCandidates.push(event.candidate.toJSON())
-                                        }
-                                    })
-
-                                    socket.on('offer', async (offer) => {
-                                        const {from, destination, content} = offer;
-                                        if (from === callerId && destination === user._id) {
-                                            console.log(content);
-                                            await peerConnection.setRemoteDescription(new RTCSessionDescription(content));
-                                            const answer = await peerConnection.createAnswer();
-                                            await peerConnection.setLocalDescription(answer);
-
-                                            const roomWithAnswer = {
-                                                type: answer.type,
-                                                sdp: answer.sdp
-                                            }
-
-                                            socket.emit('answer', {
-                                                from: user._id,
-                                                destination: callerId,
-                                                content: roomWithAnswer
-                                            })
-                                        }
-                                    })
-
-                                    socket.on('callerCandidates', async (icecandidate) => {
-                                        const {from, destination, content} = icecandidate;
-                                        if (from === callerId && destination === user._id) {
-                                            await peerConnection.addIceCandidate(new RTCIceCandidate(content));
-                                            doneNegotiation = true;
-                                            for (var i = 0; i < localIceCandidates.length; i++) {
-                                                socket.emit('calleeCandidates', {
-                                                    from: user._id,
-                                                    destination: callerId,
-                                                    content: localIceCandidates[i]
-                                                })
-                                            }
-                                        }
-                                    })
+                                    }
                                 }
                             })
                         }

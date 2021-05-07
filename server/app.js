@@ -128,7 +128,7 @@ io.on('connection', async (socket) => {
         socket.join(roomId);
         const numOfClients = io.sockets.adapter.rooms.get(roomId).size;
         if (numOfClients > 1) {
-            io.in(roomId).emit('newclient', user._id);
+            socket.to(roomId).emit('newclient', user._id);
         }
     })
 
