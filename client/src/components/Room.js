@@ -15,6 +15,7 @@ export default function ApplyTutor(props) {
     }
 
     const index = useRef();
+    index.current = 0;
 
     setDisplayNavbar(true);
     useEffect(() => {
