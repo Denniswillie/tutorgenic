@@ -233,7 +233,7 @@ export default function ApplyTutor(props) {
             <video id="localVideo" muted autoPlay playsInLine></video><br />
             {remoteStreams.map(remoteStream => {
                 return <div>
-                    <video ref={video => {video.srcObject = remoteStream;}} autoPlay playsInLine></video><br />
+                    <video srcObject={remoteStream} autoPlay playsInLine></video><br />
                 </div>;
             })}
         </div>
