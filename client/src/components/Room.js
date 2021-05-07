@@ -1,11 +1,20 @@
 import axios from 'axios';
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useRef} from 'react';
 import io from "socket.io-client";
 import Cookies from 'js-cookie';
 
 export default function ApplyTutor(props) {
     const {setDisplayNavbar, setUser, courseId} = props;
     const [remoteStreams, setRemoteStreams] = useState([]);
+    const videoRefs = [];
+    for (var i = 0; i < 30; i++) {
+        videoRefs.push({
+            ref: useRef(),
+            activated: false
+        })
+    }
+
+    const index = useRef();
 
     setDisplayNavbar(true);
     useEffect(() => {
@@ -40,6 +49,8 @@ export default function ApplyTutor(props) {
                     socket.emit('courseId', courseId);
 
                     socket.on('newclient', async (newClientId) => {
+                        const curr_index = index.current;
+                        index.current++;
                         const peerConnection = new RTCPeerConnection(configuration);
                         localStream.getTracks().forEach(track => {
                             peerConnection.addTrack(track, localStream);
@@ -56,9 +67,12 @@ export default function ApplyTutor(props) {
                                 if (msg.destination == user._id && msg.from === newClientId) {
                                     var answered = false;
                                     const remoteStream = new MediaStream();
-                                    setRemoteStreams(prevData => {
-                                        return [...prevData, remoteStream];
-                                    })
+                                    // setRemoteStreams(prevData => {
+                                    //     return [...prevData, remoteStream];
+                                    // })
+
+                                    videoRefs[curr_index].ref.current.style.display = "";
+                                    videoRefs[curr_index].ref.current.srcObject = remoteStream;
                                     // const temp = document.createElement('video');
                                     // temp.srcObject = remoteStream;
 
@@ -140,11 +154,14 @@ export default function ApplyTutor(props) {
                                     })
 
                                     const remoteStream = new MediaStream();
-                                    setRemoteStreams(prevData => {
-                                        return [...prevData, remoteStream];
-                                    })
+                                    // setRemoteStreams(prevData => {
+                                    //     return [...prevData, remoteStream];
+                                    // })
                                     // const temp = document.createElement('video');
                                     // temp.srcObject = remoteStream;
+
+                                    videoRefs[curr_index].ref.current.style.display = "";
+                                    videoRefs[curr_index].ref.current.srcObject = remoteStream;
 
                                     peerConnection.addEventListener('connectionstatechange', () => {
                                         if (peerConnection.connectionState === "connected") {
@@ -225,16 +242,21 @@ export default function ApplyTutor(props) {
         }
     }, [setUser])
 
+    // {remoteStreams.map(remoteStream => {
+    //     return <div>
+    //         <video ref={video => {video.srcObject = remoteStream;}} autoPlay playsInLine></video><br />
+    //     </div>;
+    // })}
+
     return <div className="wrapper">
         <div className="content" style={{flex: "0.75"}}>
 
         </div>
         <div className="sidebar" style={{flex: "0.25", overflow: "auto"}}>
             <video id="localVideo" muted autoPlay playsInLine></video><br />
-            {remoteStreams.map(remoteStream => {
-                return <div>
-                    <video ref={video => {video.srcObject = remoteStream;}} autoPlay playsInLine></video><br />
-                </div>;
+            
+            {videoRefs.map(videoRef => {
+                return <video style={{display: "none"}} ref={videoRef.ref} autoPlay playsInLine></video>
             })}
         </div>
     </div>
