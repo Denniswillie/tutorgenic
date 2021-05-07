@@ -9,43 +9,63 @@ export default function ApplyTutor(props) {
     const videoRefs = [];
     videoRefs.push({
         ref: useRef(),
-        activated: false
+        activated: false,
+        userId: null
     })
     videoRefs.push({
         ref: useRef(),
-        activated: false
+        activated: false,
+        userId: null
     })
     videoRefs.push({
         ref: useRef(),
-        activated: false
+        activated: false,
+        userId: null
     })
     videoRefs.push({
         ref: useRef(),
-        activated: false
+        activated: false,
+        userId: null
     })
     videoRefs.push({
         ref: useRef(),
-        activated: false
+        activated: false,
+        userId: null
     })
     videoRefs.push({
         ref: useRef(),
-        activated: false
+        activated: false,
+        userId: null
     })
     videoRefs.push({
         ref: useRef(),
-        activated: false
+        activated: false,
+        userId: null
     })
     videoRefs.push({
         ref: useRef(),
-        activated: false
+        activated: false,
+        userId: null
     })
     videoRefs.push({
         ref: useRef(),
-        activated: false
+        activated: false,
+        userId: null
     })
     videoRefs.push({
         ref: useRef(),
-        activated: false
+        activated: false,
+        userId: null
+    })
+    videoRefs.push({
+        ref: useRef(),
+        activated: false,
+        userId: null
+    })
+    videoRefs.push({
+        ref: useRef(),
+        activated: false,
+        userId: null
     })
 
     const index = useRef();
@@ -92,6 +112,7 @@ export default function ApplyTutor(props) {
                             })
                             const curr_index = index.current;
                             index.current++;
+                            videoRefs[curr_index].userId = newClientId;
                             // as caller
                             socket.emit('callerPing', {
                                 from: user._id,
@@ -189,6 +210,7 @@ export default function ApplyTutor(props) {
                             })
                             const curr_index = index.current;
                             index.current++;
+                            videoRefs[curr_index].userId = msg.from;
                             const callerId = msg.from;
                             socket.emit('calleePing', {
                                 from: user._id,
@@ -271,6 +293,17 @@ export default function ApplyTutor(props) {
                                     }
                                 }
                             })
+                        }
+                    })
+
+                    socket.on('disconnect', (userId) => {
+                        for (var i = 0; i < videoRefs.length; i++) {
+                            if (videoRefs[i].userId && videoRefs[i].userId === userId) {
+                                videoRefs[i].ref.current.style.display = "none";
+                                videoRefs[i].ref.current.srcObject = null;
+                                videoRefs[i].activated = false;
+                                videoRefs[i].userId = null;
+                            }
                         }
                     })
                 } else {

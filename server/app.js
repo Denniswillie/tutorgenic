@@ -132,6 +132,10 @@ io.on('connection', async (socket) => {
         }
     })
 
+    socket.on('disconnect', () => {
+        io.in(roomId).emit('disconnect', user._id);
+    })
+
     socket.on('callerPing', ping => {
         socket.to(roomId).emit('callerPing', ping);
     })
