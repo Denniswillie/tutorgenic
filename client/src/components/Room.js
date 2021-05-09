@@ -384,7 +384,7 @@ export default function ApplyTutor(props) {
         }
     }
 
-    return <div className="wrapper">
+    return <div className="wrapper" style={{overflow: "hidden"}}>
         <div className="content" style={{flex: "0.75", paddingTop: "0"}}>
             <div style={{
                 display: "flex",
