@@ -14,6 +14,7 @@ export default function ApplyTutor(props) {
     const videoRefs = [];
     const [audioMuted, setAudioMuted] = useState(false);
     const [videoMuted, setVideoMuted] = useState(false);
+    const localStream = useRef();
     videoRefs.push({
         ref: useRef(),
         activated: false,
@@ -99,11 +100,11 @@ export default function ApplyTutor(props) {
                             ],
                             iceCandidatePoolSize: 10,
                     };
-                    const localStream = await navigator.mediaDevices.getUserMedia({
+                    localStream.current = await navigator.mediaDevices.getUserMedia({
                         video: true,
                         audio: true
                     })
-                    document.querySelector('#localVideo').srcObject = localStream;
+                    document.querySelector('#localVideo').srcObject = localStream.current;
                     const socket = io.connect(process.env.NODE_ENV === "production" ? "https://www.tutorgenic.com" : "http://localhost:5000", {
                         query: 'session_id=' + Cookies.get('connect.sid').replace('s:','').split('.')[0]
                     });
@@ -114,8 +115,8 @@ export default function ApplyTutor(props) {
                         if (newClientId !== user._id) {
                             console.log('as a caller')
                             const peerConnection = new RTCPeerConnection(configuration);
-                            localStream.getTracks().forEach(track => {
-                                peerConnection.addTrack(track, localStream);
+                            localStream.current.getTracks().forEach(track => {
+                                peerConnection.addTrack(track, localStream.current);
                             })
                             const curr_index = index.current;
                             index.current++;
@@ -231,8 +232,8 @@ export default function ApplyTutor(props) {
                     socket.on('callerPing', msg => {
                         if (msg.destination === user._id) {
                             const peerConnection = new RTCPeerConnection(configuration);
-                            localStream.getTracks().forEach(track => {
-                                peerConnection.addTrack(track, localStream);
+                            localStream.current.getTracks().forEach(track => {
+                                peerConnection.addTrack(track, localStream.current);
                             })
                             const curr_index = index.current;
                             index.current++;
@@ -355,12 +356,40 @@ export default function ApplyTutor(props) {
     //     </div>;
     // })}
 
+    function toggleAudioMute() {
+        if (localStream.current) {
+            const audioTracks = localStream.current.getAudioTracks();
+            if (audioTracks.length === 0) {
+                alert('No audio found');
+                return;
+            }
+            for (var i = 0; i < audioTracks.length; ++i) {
+                audioTracks[i].enabled = !audioTracks[i].enabled;
+            }
+            setAudioMuted(!audioMuted);
+        }
+    }
+
+    function toggleVideoMute() {
+        if (localStream.current) {
+            const videoTracks = localStream.current.getVideoTracks();
+            if (videoTracks.length === 0) {
+                alert('No video found');
+                return;
+            }
+            for (var i = 0; i < videoTracks.length; ++i) {
+                videoTracks[i].enabled = !videoTracks[i].enabled;
+            }
+            setVideoMuted(!videoMuted);
+        }
+    }
+
     return <div className="wrapper">
         <div className="content" style={{flex: "0.75", paddingTop: "0"}}>
             <div style={{
                 display: "flex",
                 flex: "0.85",
-                backgroundColor: "blue",
+                backgroundColor: "white",
                 width: "100%",
                 overflow: "hidden"
             }}>
@@ -376,11 +405,11 @@ export default function ApplyTutor(props) {
                 alignItems: "center"
             }}>
                 <div style={{margin: "auto"}}>
-                    <IconButton style={{marginLeft: "1em"}}>
+                    <IconButton style={{marginLeft: "1em"}} onClick={toggleAudioMute}>
                         {audioMuted ? <MicOffIcon fontSize="large"/> : <MicIcon fontSize="large"/>}
                     </IconButton>
                     <IconButton style={{marginLeft: "1em"}}><CallEndIcon fontSize="large" style={{color: "red"}}/></IconButton>
-                    <IconButton style={{marginLeft: "1em"}}>
+                    <IconButton style={{marginLeft: "1em"}} onClick={toggleVideoMute}>
                         {videoMuted ? <VideocamOffIcon fontSize="large" /> : <VideocamIcon fontSize="large"/>}
                     </IconButton>
                 </div>
