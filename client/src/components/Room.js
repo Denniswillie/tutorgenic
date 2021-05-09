@@ -197,6 +197,25 @@ export default function ApplyTutor(props) {
                                             await peerConnection.addIceCandidate(new RTCIceCandidate(content));
                                         }
                                     })
+
+                                    socket.on('disconnected', (userId) => {
+                                        if (userId === newClientId) {
+                                            for (var i = 0; i < videoRefs.length; i++) {
+                                                if (videoRefs[i].userId && videoRefs[i].userId === userId) {
+                                                    videoRefs[i].ref.current.style.display = "none";
+                                                    videoRefs[i].ref.current.srcObject = null;
+                                                    videoRefs[i].activated = false;
+                                                    videoRefs[i].userId = null;
+                                                    if (remoteStream) {
+                                                        remoteStream.getTracks().forEach(track => track.stop());
+                                                    }
+                                                    if (peerConnection) {
+                                                        peerConnection.close();
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    })
                                 }
                             })
                         } 
@@ -293,17 +312,25 @@ export default function ApplyTutor(props) {
                                     }
                                 }
                             })
-                        }
-                    })
 
-                    socket.on('disconnected', (userId) => {
-                        for (var i = 0; i < videoRefs.length; i++) {
-                            if (videoRefs[i].userId && videoRefs[i].userId === userId) {
-                                videoRefs[i].ref.current.style.display = "none";
-                                videoRefs[i].ref.current.srcObject = null;
-                                videoRefs[i].activated = false;
-                                videoRefs[i].userId = null;
-                            }
+                            socket.on('disconnected', (userId) => {
+                                if (userId === callerId) {
+                                    for (var i = 0; i < videoRefs.length; i++) {
+                                        if (videoRefs[i].userId && videoRefs[i].userId === userId) {
+                                            videoRefs[i].ref.current.style.display = "none";
+                                            videoRefs[i].ref.current.srcObject = null;
+                                            videoRefs[i].activated = false;
+                                            videoRefs[i].userId = null;
+                                            if (remoteStream) {
+                                                remoteStream.getTracks().forEach(track => track.stop());
+                                            }
+                                            if (peerConnection) {
+                                                peerConnection.close();
+                                            }
+                                        }
+                                    }
+                                }
+                            })
                         }
                     })
                 } else {
