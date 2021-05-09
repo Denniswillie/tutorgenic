@@ -130,6 +130,10 @@ io.on('connection', async (socket) => {
         }
     })
 
+    socket.on("send-changes", delta => {
+        socket.to(roomId).emit("receive-changes", delta)
+    })
+
     socket.on('disconnect', () => {
         io.in(roomId).emit('disconnected', user._id);
     })

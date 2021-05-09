@@ -8,12 +8,17 @@ import MicOffIcon from '@material-ui/icons/MicOff';
 import VideocamIcon from '@material-ui/icons/Videocam';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 import CallEndIcon from '@material-ui/icons/CallEnd';
+import Quill from 'quill';
+import "quill/dist/quill.snow.css";
 
 export default function ApplyTutor(props) {
-    const {setDisplayNavbar, setUser, courseId} = props;
+    const {setDisplayNavbar, courseId} = props;
     const videoRefs = [];
     const [audioMuted, setAudioMuted] = useState(false);
     const [videoMuted, setVideoMuted] = useState(false);
+    // const [user, setUser] = useState();
+    // const [socket, setSocket] = useState();
+    // const [quill, setQuill] = useState();
     const localStream = useRef();
     videoRefs.push({
         ref: useRef(),
@@ -87,8 +92,9 @@ export default function ApplyTutor(props) {
             .catch(err => console.log(err))
             .then(async (res) => {
                 if (res.isLoggedIn) {
+                    const quill = new Quill("#textEditor", {theme: "snow", placeholder: 'Start typing here...',})
                     const user = res.user;
-                    setUser(user);
+                    props.setUser(user);
                     const configuration = {
                         iceServers: [
                             {
@@ -110,6 +116,15 @@ export default function ApplyTutor(props) {
                     });
 
                     socket.emit('courseId', courseId);
+
+                    quill.on("text-change", (delta, oldDelta, source) => {
+                        if (source !== "user") return
+                        socket.emit("send-changes", delta)
+                    })
+
+                    socket.on("receive-changes", delta => {
+                        quill.updateContents(delta)
+                    })
 
                     socket.on('newclient', async (newClientId) => {
                         if (newClientId !== user._id) {
@@ -348,7 +363,7 @@ export default function ApplyTutor(props) {
         return () => {
             ac.abort();
         }
-    }, [setUser])
+    }, [props.setUser])
 
     // {remoteStreams.map(remoteStream => {
     //     return <div>
@@ -386,14 +401,14 @@ export default function ApplyTutor(props) {
 
     return <div className="wrapper" style={{overflow: "hidden"}}>
         <div className="content" style={{flex: "0.75", paddingTop: "0"}}>
-            <div style={{
+            <div id="textEditor" style={{
                 display: "flex",
                 flex: "0.85",
                 backgroundColor: "white",
                 width: "100%",
                 overflow: "hidden"
             }}>
-                
+
             </div>
             <div style={{
                 display: "flex",
