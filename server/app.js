@@ -10,8 +10,6 @@ const passport = require('passport');
 const session = require('express-session');
 const sslRedirect = require('heroku-ssl-redirect').default;
 const path = require('path');
-console.log("this is the port: " + process.env.PORT);
-console.log("in production: " + inProduction);
 
 // passportSetup will use the pool first, and then will be handed to app.js.
 const db = require('./passportSetup');
@@ -91,7 +89,7 @@ app.use('/tutor', require('./routes/tutor'));
 app.use('/course', require('./routes/course'));
 app.use('/room', require('./routes/room'));
 
-const server = app.listen(process.env.PORT);
+const server = app.listen(inProduction ? process.env.PORT : 5000);
 
 const io = socket(server, {
     cors: {
