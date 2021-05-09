@@ -408,7 +408,10 @@ export default function ApplyTutor(props) {
                     <IconButton style={{marginLeft: "1em"}} onClick={toggleAudioMute}>
                         {audioMuted ? <MicOffIcon fontSize="large"/> : <MicIcon fontSize="large"/>}
                     </IconButton>
-                    <IconButton style={{marginLeft: "1em"}}><CallEndIcon fontSize="large" style={{color: "red"}}/></IconButton>
+                    <IconButton style={{marginLeft: "1em"}} onClick={() => {
+                        alert("You're leaving this meeting.");
+                        window.open('/', '_self');
+                    }}><CallEndIcon fontSize="large" style={{color: "red"}}/></IconButton>
                     <IconButton style={{marginLeft: "1em"}} onClick={toggleVideoMute}>
                         {videoMuted ? <VideocamOffIcon fontSize="large" /> : <VideocamIcon fontSize="large"/>}
                     </IconButton>
