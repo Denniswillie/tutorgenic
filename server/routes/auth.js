@@ -85,7 +85,7 @@ router.post('/login', upload.none(), (req, res, next) => {
 
 router.get('/logout', upload.none(), async (req, res) => {
     req.logout();
-    res.redirect(process.env.CLIENT_URL);
+    res.redirect(inProduction ? process.env.CLIENT_URL : process.env.DEV_CLIENT_URL);
 })
 
 router.get("/google",
@@ -96,8 +96,8 @@ router.get("/google",
 
 router.get("/google/tutorgenic",
     passport.authenticate('google', {
-        failureRedirect: process.env.CLIENT_URL + '/googlefailure',
-        successRedirect: process.env.CLIENT_URL
+        failureRedirect: inProduction ? process.env.CLIENT_URL : process.env.DEV_CLIENT_URL + '/googlefailure',
+        successRedirect: inProduction ? process.env.CLIENT_URL : process.env.DEV_CLIENT_URL
     })
 );
 

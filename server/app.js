@@ -62,7 +62,7 @@ app.use(express.urlencoded({
 
 app.use(
     cors({
-        origin: process.env.CLIENT_URL,
+        origin: inProduction ? process.env.CLIENT_URL : process.env.DEV_CLIENT_URL,
         methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
         credentials: true
     })
@@ -95,7 +95,7 @@ const server = app.listen(process.env.PORT);
 
 const io = socket(server, {
     cors: {
-        origin: process.env.CLIENT_URL,
+        origin: inProduction ? process.env.CLIENT_URL : process.env.DEV_CLIENT_URL,
         methods: ['GET', 'POST']
     }
 })
