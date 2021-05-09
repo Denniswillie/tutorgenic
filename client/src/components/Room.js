@@ -2,11 +2,18 @@ import axios from 'axios';
 import {useEffect, useState, useRef} from 'react';
 import io from "socket.io-client";
 import Cookies from 'js-cookie';
+import IconButton from "@material-ui/core/IconButton";
+import MicIcon from '@material-ui/icons/Mic';
+import MicOffIcon from '@material-ui/icons/MicOff';
+import VideocamIcon from '@material-ui/icons/Videocam';
+import VideocamOffIcon from '@material-ui/icons/VideocamOff';
+import CallEndIcon from '@material-ui/icons/CallEnd';
 
 export default function ApplyTutor(props) {
     const {setDisplayNavbar, setUser, courseId} = props;
-    const [remoteStreams, setRemoteStreams] = useState([]);
     const videoRefs = [];
+    const [audioMuted, setAudioMuted] = useState(false);
+    const [videoMuted, setVideoMuted] = useState(false);
     videoRefs.push({
         ref: useRef(),
         activated: false,
@@ -349,8 +356,35 @@ export default function ApplyTutor(props) {
     // })}
 
     return <div className="wrapper">
-        <div className="content" style={{flex: "0.75"}}>
-
+        <div className="content" style={{flex: "0.75", paddingTop: "0"}}>
+            <div style={{
+                display: "flex",
+                flex: "0.85",
+                backgroundColor: "blue",
+                width: "100%",
+                overflow: "hidden"
+            }}>
+                
+            </div>
+            <div style={{
+                display: "flex",
+                flex: "0.15",
+                backgroundColor: "#ffffff",
+                width: "100%",
+                overflow: "hidden",
+                placeItems: "center",
+                alignItems: "center"
+            }}>
+                <div style={{margin: "auto"}}>
+                    <IconButton style={{marginLeft: "1em"}}>
+                        {audioMuted ? <MicOffIcon fontSize="large"/> : <MicIcon fontSize="large"/>}
+                    </IconButton>
+                    <IconButton style={{marginLeft: "1em"}}><CallEndIcon fontSize="large" style={{color: "red"}}/></IconButton>
+                    <IconButton style={{marginLeft: "1em"}}>
+                        {videoMuted ? <VideocamOffIcon fontSize="large" /> : <VideocamIcon fontSize="large"/>}
+                    </IconButton>
+                </div>
+            </div>
         </div>
         <div className="sidebar" style={{flex: "0.25", overflow: "auto"}}>
             <video id="localVideo" muted autoPlay playsInLine></video><br />
