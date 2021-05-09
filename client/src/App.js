@@ -15,7 +15,7 @@ export default function App(props) {
     const [displayNavbar, setDisplayNavbar] = useState(false);
     const [user, setUser] = useState();
     return (
-        <main style={{overflow: "hidden"}}>
+        <main>
             {displayNavbar && <Navbar user={user}/>}
             <Switch>
                 <Route path="/" exact render={(props) => {
