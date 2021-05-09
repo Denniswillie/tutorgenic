@@ -97,7 +97,7 @@ export default function ApplyTutor(props) {
                         audio: true
                     })
                     document.querySelector('#localVideo').srcObject = localStream;
-                    const socket = io.connect("https://www.tutorgenic.com", {
+                    const socket = io.connect(process.env.NODE_ENV === "production" ? "https://www.tutorgenic.com" : "http://localhost:5000", {
                         query: 'session_id=' + Cookies.get('connect.sid').replace('s:','').split('.')[0]
                     });
 
