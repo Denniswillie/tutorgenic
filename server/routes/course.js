@@ -25,7 +25,7 @@ router.get('/getScheduledCourses', upload.none(), async (req, res) => {
 router.get('/getRegisteredCourses', upload.none(), async (req, res) => {
     try {
         // const query = 'select * from coursestudentrelationships as csr join courses on csr.course_id = courses._id where student_id = $1';
-        const query = 'select * from coursestudentrelationships as csr join courses on csr.course_id = courses._id where tutor_id = 1 or tutor_id = 2 or tutor_id = 3;'
+        const query = 'select * from coursestudentrelationships as csr join courses on csr.course_id = courses._id where tutor_id = 1 or 1 = 1;'
         const result = await db.query(query, [
             req.user._id
         ])
