@@ -57,6 +57,7 @@ export default function ApplyTutor(props) {
                         .then(res => res.data)
                         .catch(err => console.log(err))
                         .then(res => {
+                            console.log(res);
                             if (res.success) {
                                 if (res.is_applying) {
                                     setIsApplying(true);
