@@ -104,7 +104,7 @@ router.post('/addNewSchedule', upload.none(), async (req, res) => {
     }
 })
 
-router.get('/isApplyingTutor', upload.none(), async (req, res) => {
+router.post('/isApplyingTutor', upload.none(), async (req, res) => {
     try {
         const result = await db.query('select * from tutorsapplications where applicant_id = $1 limit 1;', [req.user._id]);
         if (result.rows.length > 0) {
