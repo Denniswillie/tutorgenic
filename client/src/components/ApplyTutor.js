@@ -53,7 +53,7 @@ export default function ApplyTutor(props) {
                     const user = res.user;
                     setUser(user);
                     setLocalUser(user);
-                    axios.get('/tutor/isApplyingTutor')
+                    axios.post('/tutor/isApplyingTutor')
                         .then(res => res.data)
                         .catch(err => console.log(err))
                         .then(res => {
