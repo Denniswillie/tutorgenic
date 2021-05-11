@@ -101,6 +101,8 @@ export default function ApplyTutor(props) {
                                 urls: [
                                 'stun:stun1.l.google.com:19302',
                                 'stun:stun2.l.google.com:19302',
+                                'turn:turn01.hubl.in?transport=udp',
+                                'turn:turn02.hubl.in?transport=tcp'
                                 ],
                             },
                             ],
