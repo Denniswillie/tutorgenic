@@ -93,6 +93,10 @@ export default function ApplyTutor(props) {
             .then(async (res) => {
                 if (res.isLoggedIn) {
                     const quill = new Quill("#textEditor", {theme: "snow", placeholder: 'Start typing here...',})
+                    quill.insertText(0, 'Start typing here...', {
+                        'color': 'black',
+                        'italic': true
+                    });
                     const user = res.user;
                     props.setUser(user);
                     const configuration = {
